@@ -8,14 +8,16 @@ export enum PlatformEnum {
 }
 
 export enum AccountStateEnum {
+    //States padrões Pending (Criada) > Binding (Bindando) > Ready (Pronto)
     BINDING = "binding", // Bindando telefone
     PENDING = "pending", // Criada (Fila de bind vai puxar depois)
-    READY = "ready", // Pronto pra fila puxar
-    IDLE = "idle", // Descartada pela fila
-    RUNNING = "running", // Rodando (Fila controlando)
-    FAILED = "failed", // Erro na fila ou em um modulo
-    BIND_FAILED = "bind_failed", // Erro ao bindar telefone
-    DONE = "done" // Finalizada
+    READY = "ready", // Pronto pra ser puxada por qualquer fila
+
+    //Errors das filas
+    BIND_FAILED = "bind_failed",
+
+    //States das filas
+    CHECKING_IN = "checking_in"
 }
 
 export enum AccountStatusEnum {
@@ -106,6 +108,7 @@ export interface AccountsSchema {
     deposits: AccountDeposits[];
     withdraws: AccountsWithdraws[];
     states: AccountState;
+    lastCheckin: Date | null;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -178,6 +181,7 @@ const AccountsSchemaMongoose = new Schema<AccountsSchema>({
     login: { type: AccountLoginInfoSchema, required: true },
     deposits: { type: [AccountDepositsSchema], default: [] },
     withdraws: { type: [AccountsWithdrawsSchema], default: [] },
+    lastCheckin: { type: Date, default: null },
     states: { type: AccountStateSchema, default: {logs: [], retries: {login: 0, bind: 0}} }
 }, { timestamps: true });
 

@@ -1,4 +1,5 @@
 import BindingQueue from "./binding";
+import CheckinQueue from "./checkin";
 
 export enum QueueStateEnum {
     IDLE = "idle",
@@ -6,21 +7,18 @@ export enum QueueStateEnum {
 }
 
 export enum QueueEnum {
-    BINDING = "binding"
+    BINDING = "binding",
+    CHECKIN = "checkin"
 }
-
-interface QueueState {
-    [QueueEnum.BINDING]: {
-        state: QueueStateEnum;
-        interval: NodeJS.Timeout | null;
-    };
-}
-
-const QUEUE_STATE: QueueState = {
+const QUEUE_STATE: any = {
     [QueueEnum.BINDING]: {
         state: QueueStateEnum.IDLE,
         interval: null
     },
+    [QueueEnum.CHECKIN]: {
+        state: QueueStateEnum.IDLE,
+        interval: null
+    }
 }
 
 export const SetQueueState = (queue: QueueEnum, state: QueueStateEnum) => {
@@ -33,6 +31,8 @@ export const GetQueueState = (queue: QueueEnum) => {
 
 export const StartQueue = () => {
     QUEUE_STATE[QueueEnum.BINDING].interval = setInterval(BindingQueue, 5000);
+    QUEUE_STATE[QueueEnum.CHECKIN].interval = setInterval(CheckinQueue, 5000);
 
     SetQueueState(QueueEnum.BINDING, QueueStateEnum.RUNNING);
+    SetQueueState(QueueEnum.CHECKIN, QueueStateEnum.RUNNING);
 }
