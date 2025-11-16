@@ -1,0 +1,19 @@
+import mongoose, { Schema } from "mongoose";
+
+interface ModelSchema {
+    createdAt: Date;
+    updatedAt: Date;
+}
+
+const ModelModel = new Schema<ModelSchema>({
+    createdAt: {
+        type: Date
+    },
+    updatedAt: {
+        type: Date
+    }
+}, { timestamps: true })
+
+const modelModel = mongoose.model<ModelSchema>("table", ModelModel);
+
+export default modelModel;
