@@ -1,10 +1,9 @@
-import axios from "axios";
 import AccountsModel, { AccountLoginTypeEnum, AccountsSchema, PlatformEnum } from "../../../schemas/accounts";
 import sitesModel from "../../../schemas/sites";
 import { EncodePayload, getServerSyncToken, slotsApi } from "../server";
 import { getProxyAgent } from "../../../helpers/proxy";
 import crypto from "crypto";
-import { Mobileheaders, passwordGen } from "../../../helpers/simulation";
+import { passwordGen } from "../../../helpers/simulation";
 
 interface RegisterWithPhoneNumberOptions {
     mode: AccountLoginTypeEnum.PHONE_NUMBER,
@@ -24,6 +23,7 @@ interface RegisterWithPhoneNumberOptions {
 
 interface RegisterWithDeviceOptions {
     mode: AccountLoginTypeEnum.GUEST,
+    needPhone?: boolean;
     source?: string;
     device: {
         id: string;
@@ -53,7 +53,7 @@ const CreateAccount = async (siteId: string, options: RegisterOptionsBase): Prom
         }
     }
 
-    const api = slotsApi(siteInfo.apiUrl, proxy);
+    const api = slotsApi(siteInfo.connection.http, proxy);
 
     const {
         source,
@@ -67,7 +67,7 @@ const CreateAccount = async (siteId: string, options: RegisterOptionsBase): Prom
 
     const regToken = await getServerSyncToken(
         deviceId,
-        siteInfo.apiUrl,
+        siteInfo.connection.http,
         proxy,
         platform
     );
@@ -136,7 +136,6 @@ const CreateAccount = async (siteId: string, options: RegisterOptionsBase): Prom
 
     try {
         const { data } = await api.post<{ new: boolean }>("reg", EncodePayload(regPayload))
-
         if (data.new) {
             //Register with successfull
             const account = new AccountsModel({
@@ -147,9 +146,12 @@ const CreateAccount = async (siteId: string, options: RegisterOptionsBase): Prom
                     proxySession: proxyAgentSession,
                     ...(options.mode === AccountLoginTypeEnum.PHONE_NUMBER && {
                         phoneNumber: options.account.phoneNumber,
-                        password: options.account.password
+                        password: password
                     })
                 },
+                ...(options.mode === AccountLoginTypeEnum.GUEST && {
+                    needPhone: options.needPhone
+                }),
                 balance: 0,
                 source: options.source,
             })

@@ -45,11 +45,11 @@ const ApiLogin = async (_account: AccountsSchema | string, useAccountProxySessio
         return { status: false, message: "Site inválido" }
     }
 
-    const api = slotsApi(siteInfo.apiUrl, proxy);
+    const api = slotsApi(siteInfo.connection.http, proxy);
 
     const loginToken = await getServerSyncToken(
         device.id,
-        siteInfo.apiUrl,
+        siteInfo.connection.http,
         proxy,
         device.platform
     );

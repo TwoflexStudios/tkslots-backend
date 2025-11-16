@@ -1,43 +1,13 @@
 import { Router } from "express";
 import AuthController from "../../../../../services/authvalidation";
 import { PermissionsEnum } from "../../../../../schemas/users";
-import sitesModel from "../../../../../schemas/sites";
+import sitesModel, { SitesSchema } from "../../../../../schemas/sites";
 import { SendResponse } from "../../../../../helpers/res";
 import axios from "axios";
+import { getRandomDeviceId, getServerInfo, getServerSyncToken } from "../../../../../bridge/api/server";
+import { PlatformEnum } from "../../../../../schemas/accounts";
+import { getProxyAgent } from "../../../../../helpers/proxy";
 
-interface SiteObject {
-    defaultChannel: string;
-    translateRate: number;
-    bTranslateCoin: boolean;
-    bShowJackpot: boolean;
-    bNeedEnsurePsw: boolean;
-    bPreview: boolean;
-    bSupportGuestLogin: boolean;
-    bFastLogin: boolean;
-    currency: string;
-    language: string;
-    defaultAreaCode: string;
-    connection: Connection;
-    gameTitle: string;
-    gameIconUrl: string;
-    loginLogoUrl: string;
-    fastLoginTimeLimit: number;
-    areaCodeList: string[];
-    bHasLobby: boolean;
-    bSkipTrackOnSubgame: boolean;
-    shopVideoHelpCfg: any[];
-    bDownNeendBindPhone: boolean;
-    assetsVersion: number;
-}
-
-interface Connection {
-    http: string;
-    tcp: Tcp;
-}
-
-interface Tcp {
-    host: string;
-}
 
 const SitesRoutes = Router();
 
@@ -59,43 +29,52 @@ SitesRoutes.post(
     async (req, res) => {
         const type = req.body.url ? "automatic" : "manual";
 
+        let config;
+
         if (type === "automatic") {
             if (!req.body.url) return SendResponse(res, { status: false, message: "URL IS REQUIRED" });
 
             const url = req.body.url;
 
-            await axios.get<SiteObject>(`${url}/localConfig.json`).then(async ({ data }) => {
-                const site = new sitesModel({
-                    url,
-                    name: data.gameTitle,
-                    apiUrl: data.connection.http.slice(0, -1),
-                    socketUrl: data.connection.tcp.host.split("wss://")[1],
-                    localKey: "0x134b04e"
-                })
-
-                await site.save()
-            }).catch(ex => {
-                return SendResponse(res, { status: false, message: "Não foi possível obter os dados do site" })
-            });
-        } else {
-            const data = req.body as SiteObject;
-
-            if (!data.connection?.tcp?.host || !data?.connection?.http || !data.gameTitle) {
-                return SendResponse(res, { status: false, message: "Dados do site inválidos." })
+            try{
+                const {data: remoteConfig} = await axios.get<SitesSchema>(`${url}/localConfig.json`);
+                config = remoteConfig;
+            }catch{
+                return SendResponse(res, {status: false, message: "Nao foi possivel obter as informacoes do site"})
             }
+            
+        } else {
+            config = req.body as SitesSchema;
+        }
 
-            const site = new sitesModel({
-                url: data.connection.http.split("login.")[1]?.split("/")[0]?.slice(0, -1),
-                name: data.gameTitle,
-                apiUrl: data.connection.http,
-                socketUrl: data.connection.tcp.host.split("wss://")[1],
-                localKey: "0x134b04e"
-            })
+        const httpURL = config.connection.http.slice(0, -1)
+        const siteExist = await sitesModel.findOne({ "connection.http": httpURL });
 
+        //getBasic info
+        const result = await getServerInfo(httpURL, getProxyAgent())
+
+        if(!result) return SendResponse(res, {status: false, message: "Nao foi possivel obter as informacoes do site"})
+
+        const configParsed = {
+            ...config,
+            connection: {
+                ...config.connection,
+                http: httpURL,
+                tcp: {
+                    host: config.connection.tcp.host.split("wss://")[1]
+                }
+            },
+            serverInfo: result
+        }
+        
+        if(siteExist){
+            await siteExist.updateOne(configParsed)
+        }else{
+            const site = new sitesModel(configParsed)
             await site.save()
         }
 
-        SendResponse(res, { status: true, message: "Site Added" })
+        SendResponse(res, { status: true, message: siteExist ? "Site atualizado" : "Site adicionado", data: configParsed })
     }
 )
 

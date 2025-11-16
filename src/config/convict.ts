@@ -38,6 +38,20 @@ const config = convict({
             doc: "",
             env: "PROXY_PASSWORD"
         }
+    },
+    bower: {
+        apiKey: {
+            default: "",
+            doc: "",
+            env: "BOWER_API_KEY"
+        }
+    },
+    activate: {
+        apiKey: {
+            default: "",
+            doc: "",
+            env: "ACTIVATE_API_KEY"
+        }
     }
 })
 

@@ -53,11 +53,11 @@ const BindPhone = async (_account: AccountsSchema | string, options: BindPhoneOp
         return { status: false, message: "Site inválido" }
     }
 
-    const api = slotsApi(siteInfo.apiUrl, proxy);
+    const api = slotsApi(siteInfo.connection.http, proxy);
 
     const loginToken = await getServerSyncToken(
         device.id,
-        siteInfo.apiUrl,
+        siteInfo.connection.http,
         proxy,
         device.platform
     );
@@ -94,9 +94,9 @@ const BindPhone = async (_account: AccountsSchema | string, options: BindPhoneOp
         if (data.code === 0) {
             const currentBalance = data.currentMoney;
             const rewardBonus = data.rewardMoney;
-            if (siteInfo.bonus !== rewardBonus) {
+            if (siteInfo.serverInfo.RegGold !== rewardBonus) {
                 await siteInfo.updateOne({
-                    bonus: rewardBonus
+                    "serverInfo.RegGold": rewardBonus
                 })
             }
             await AccountsModel.updateOne(

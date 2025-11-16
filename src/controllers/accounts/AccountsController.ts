@@ -60,12 +60,9 @@ class AccountsController {
     static createTestAccount() {
         return async (req: Request, res: Response) => {
             const [deviceId, hash, gpsId] = getRandomDeviceId(PlatformEnum.ANDROID);
-            const account = await CreateAccount("", {
-                mode: AccountLoginTypeEnum.PHONE_NUMBER,
-                account: {
-                    phoneNumber: "1234567890",
-                    code: ""
-                },
+            const account = await CreateAccount("69193a13069e926656f3e810", {
+                mode: AccountLoginTypeEnum.GUEST,
+                needPhone: true,
                 device: {
                     id: deviceId,
                     gpsId: gpsId,

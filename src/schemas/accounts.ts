@@ -8,10 +8,13 @@ export enum PlatformEnum {
 }
 
 export enum AccountStateEnum {
-    PENDING = "pending", // Criada (Fila vai puxar depois)
+    BINDING = "binding", // Bindando telefone
+    PENDING = "pending", // Criada (Fila de bind vai puxar depois)
+    READY = "ready", // Pronto pra fila puxar
+    IDLE = "idle", // Descartada pela fila
     RUNNING = "running", // Rodando (Fila controlando)
-    ERROR = "error", // Erro na fila
-    DISCARDED = "discarded", // Descartada pela fila
+    FAILED = "failed", // Erro na fila ou em um modulo
+    BIND_FAILED = "bind_failed", // Erro ao bindar telefone
     DONE = "done" // Finalizada
 }
 
@@ -75,6 +78,18 @@ export interface AccountLoginInfo {
     proxySession: string;
 }
 
+interface AccountState {
+    logs: {
+        type: string;
+        message: string;
+        date: Date;
+    }[];
+    retries: {
+        login: number,
+        bind: number
+    }
+}
+
 export interface AccountsSchema {
     siteId: mongoose.Types.ObjectId;
     userId: mongoose.Types.ObjectId | null;
@@ -83,11 +98,14 @@ export interface AccountsSchema {
     vipLevel: number;
     source?: string;
     status: AccountStatusEnum;
+    needPhone?: boolean;
+    stateReason?: string;
     state: AccountStateEnum;
     balance: number;
     login: AccountLoginInfo;
     deposits: AccountDeposits[];
     withdraws: AccountsWithdraws[];
+    states: AccountState;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -132,19 +150,35 @@ const AccountLoginInfoSchema = new Schema<AccountLoginInfo>({
 
 // Main schema
 
+const LogSchema = new Schema({
+    type: String,
+    message: String,
+    date: Date
+}, { _id: false });
+
+const AccountStateSchema = new Schema({
+    logs: [LogSchema],
+    retries: {
+        login: Number,
+        bind: Number
+    }
+});
 const AccountsSchemaMongoose = new Schema<AccountsSchema>({
     siteId: { type: Schema.Types.ObjectId, required: true, ref: "sites" },
     userId: { type: Schema.Types.ObjectId, ref: "users", default: null },
     uid: { type: Number, default: null },
     username: { type: String, default: null },
     vipLevel: { type: Number, default: 0 },
+    needPhone: { type: Boolean, default: false },
     source: { type: String, default: null },
     status: { type: String, enum: AccountStatusEnum, default: AccountStatusEnum.CREATED },
     state: { type: String, enum: AccountStateEnum, default: AccountStateEnum.PENDING },
+    stateReason: { type: String, default: "" },
     balance: { type: Number, default: 0 },
     login: { type: AccountLoginInfoSchema, required: true },
     deposits: { type: [AccountDepositsSchema], default: [] },
-    withdraws: { type: [AccountsWithdrawsSchema], default: [] }
+    withdraws: { type: [AccountsWithdrawsSchema], default: [] },
+    states: { type: AccountStateSchema, default: {logs: [], retries: {login: 0, bind: 0}} }
 }, { timestamps: true });
 
 const AccountsModel: Model<AccountsSchema> = mongoose.model<AccountsSchema>("accounts", AccountsSchemaMongoose);

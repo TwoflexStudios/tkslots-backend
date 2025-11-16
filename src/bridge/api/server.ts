@@ -2,6 +2,7 @@ import axios from "axios";
 import { PlatformEnum } from "../../schemas/accounts";
 import crypto from "crypto";
 import { Mobileheaders } from "../../helpers/simulation";
+import { SiteServerInfo } from "../../schemas/sites";
 
 export const slotsApi = (url: string, proxy: any) => axios.create({
     baseURL: url,
@@ -12,11 +13,9 @@ export const slotsApi = (url: string, proxy: any) => axios.create({
 
 export const getServerSyncToken = async (deviceId: string, loginUrl: string, proxyAgent: any, platform: PlatformEnum): Promise<[string, number] | false> => {
     try {
-        const payload = { "type": 1, "appVer": "1.0.0", "resVer": "514", "luaVer": "514", "channel": "998", "platform": platform }
+        const data = await getServerInfo(loginUrl, proxyAgent)
 
-        const api = slotsApi(loginUrl, proxyAgent)
-
-        const { data } = await api.post(`${loginUrl}/info`, `content=${Buffer.from(JSON.stringify(payload)).toString("base64")}`)
+        if(!data) return false;
 
         const { svrTime } = data;
 
@@ -31,6 +30,22 @@ export const getServerSyncToken = async (deviceId: string, loginUrl: string, pro
         const token = crypto.createHash('md5').update(raw).digest('hex');
 
         return [token, syncTime];
+
+    } catch (ex) {
+        // console.log(ex)
+        return false;
+    }
+}
+
+export const getServerInfo = async (loginUrl: string, proxyAgent: any): Promise<SiteServerInfo | false> => {
+    try {
+        const payload = { "type": 1, "appVer": "1.0.0", "resVer": "514", "luaVer": "514", "channel": "998", "platform": PlatformEnum.ANDROID }
+
+        const api = slotsApi(loginUrl, proxyAgent)
+
+        const { data } = await api.post(`${loginUrl}/info`, `content=${Buffer.from(JSON.stringify(payload)).toString("base64")}`)
+
+        return data;
 
     } catch (ex) {
         // console.log(ex)
