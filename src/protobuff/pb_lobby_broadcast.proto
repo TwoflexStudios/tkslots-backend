@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package pb_lobby_broadcast;
+
+message notify_game_notice_msg {
+  int32 id = 1;
+  string nickname = 2;
+  int64 win = 3;
+  int32 gameid = 4;
+  int32 roomid = 5;
+  int32 time = 6;
+  int32 tag = 7;
+}
+
+message notify_notice_list_msg {
+  repeated notify_game_notice_msg noticelist = 1;
+}
+
+message sc_jackpot_winner_msg {
+  repeated notify_game_notice_msg winnerlist = 1;
+}
+
+message red_point {
+  string tag = 1;
+  int32 num = 2;
+}
+
+message sc_red_points {
+  repeated red_point points = 1;
+}

@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package pb_lobby_notice;
+
+message notice_marquee_msg {
+  string message = 1;
+  int32 level = 2;
+  int32 showtimes = 3;
+  int32 frequency = 4;
+  string starttime = 5;
+  string endtime = 6;
+}
+
+message sc_notice_marquee {
+  repeated notice_marquee_msg marqueelist = 1;
+}
+
+message notice_window_msg {
+  int32 id = 1;
+  int32 level = 2;
+  string title = 3;
+  string message = 4;
+  int32 showtype = 5;
+}
+
+message sc_notice_window {
+  repeated notice_window_msg windowlist = 1;
+}

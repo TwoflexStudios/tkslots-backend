@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package pb_lobby_rank;
+
+message PlayerProfit {
+  int32 rank = 1;
+  string nickname = 2;
+  int32 faceid = 3;
+  int32 viplevel = 4;
+  int64 profit = 5;
+}
+
+message PlayerLuck {
+  int32 rank = 1;
+  string nickname = 2;
+  int32 faceid = 3;
+  int32 viplevel = 4;
+  int32 gameid = 5;
+  int64 win = 6;
+  int64 time = 7;
+}
+
+message sc_rank_profit {
+  PlayerProfit my = 1;
+  repeated PlayerProfit ranks = 2;
+}
+
+message sc_rank_luck {
+  PlayerLuck my = 1;
+  repeated PlayerLuck ranks = 2;
+}

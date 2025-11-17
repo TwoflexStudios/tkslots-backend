@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+package pb_lobby_roulette;
+
+message roulette_item {
+  int32 icon = 1;
+  int64 itemscore = 2;
+}
+
+message roulette {
+  int64 basepoint = 1;
+  int32 type = 2;
+  repeated roulette_item item = 3;
+}
+
+message roulette_base {
+  int64 bonuspoint = 1;
+  repeated roulette list = 2;
+}
+
+message cs_roulette_spin {
+  int32 type = 1;
+}
+
+message sc_roulette_spin {
+  int32 type = 1;
+  int32 index = 2;
+  int64 reward = 3;
+  int64 bonuspoint = 4;
+  int64 score = 5;
+}
+
+message cs_roulette_record {
+  int32 type = 1;
+}
+
+message spin_record {
+  string nickname = 1;
+  int64 reward = 2;
+  int32 type = 3;
+  int64 timestamp = 4;
+}
+
+message sc_roulette_record {
+  int32 type = 1;
+  repeated spin_record list = 2;
+}
+
+message sc_benefits_base {
+  int32 dayCount = 1;
+  int64 todayTotal = 2;
+  int64 todayGet = 3;
+  int64 bonuspoint = 4;
+  int32 status = 5;
+  int64 todayScore = 6;
+}
+
+message sc_get_benefits {
+  int32 result = 1;
+}

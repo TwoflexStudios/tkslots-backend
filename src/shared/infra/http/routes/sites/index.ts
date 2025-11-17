@@ -61,7 +61,7 @@ SitesRoutes.post(
                 ...config.connection,
                 http: httpURL,
                 tcp: {
-                    host: config.connection.tcp.host.split("wss://")[1]
+                    host: config.connection.tcp.host
                 }
             },
             serverInfo: result

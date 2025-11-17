@@ -1,0 +1,98 @@
+syntax = "proto3";
+
+package pb_share;
+
+message cs_share_info_msg {}
+
+message sc_share_info_msg {
+  int64 TotalShareReward = 1;
+  int32 subCount = 2;
+  int32 TeamCount = 3;
+  int64 subCoins = 4;
+  int32 teamCoins = 5;
+  int64 totalCoins = 6;
+  int64 ToBeReceive = 7;
+  string shareUrl = 8;
+  repeated string shareQRCodeUrl = 9;
+  string clicktitle = 10;
+  string clickurl = 11;
+}
+
+message cs_share_sub_info_msg {
+  int32 pageSize = 1;
+  int32 pageIndex = 2;
+}
+
+message sub_info_block {
+  int32 userID = 1;
+  string nick = 2;
+  int64 userCoins = 3;
+  int64 teamCoins = 4;
+  int32 teamCount = 5;
+  int64 totalCoins = 6;
+  int64 createTime = 7;
+}
+
+message sc_share_sub_info_msg {
+  repeated sub_info_block list = 1;
+  int32 count = 2;
+}
+
+message cs_share_receive_history {}
+
+message reward_block {
+  int64 time = 1;
+  int64 coin = 2;
+  string nick = 3;
+}
+
+message sc_share_receive_history_msg {
+  repeated reward_block history = 1;
+}
+
+message cs_share_rank_msg {}
+
+message share_rank_block {
+  string nick = 1;
+  int64 coin = 2;
+}
+
+message sc_share_rank_msg {
+  repeated share_rank_block list = 1;
+}
+
+message cs_receive_reward_msg {}
+
+message sc_receive_reward_msg {
+  int32 status = 1;
+}
+
+message cs_query_sub_info_by_id_msg {
+  int32 userID = 1;
+}
+
+message sc_query_sub_info_by_id_msg {
+  sub_info_block info = 1;
+}
+
+message cs_get_share_gift {
+  int32 index = 1;
+}
+
+message gift_item {
+  int32 index = 1;
+  int32 pcount = 2;
+  int64 reward = 3;
+  int32 status = 4;
+}
+
+message sc_query_share_gift {
+  repeated gift_item giftlist = 1;
+  int64 subcount = 2;
+  int64 limit = 3;
+  int32 betx = 4;
+}
+
+message sc_get_share_gift {
+  gift_item gift = 1;
+}

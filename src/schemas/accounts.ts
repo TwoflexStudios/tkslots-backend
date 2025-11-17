@@ -21,8 +21,9 @@ export enum AccountStateEnum {
 }
 
 export enum AccountStatusEnum {
-    CREATED = "created", // Criada
+    IDLE = "idle", // Criada
     READY = "ready", // Pronta para ser coletada por um agente
+    DONE = "done", // Concluida
     IN_PROGRESS = "in_progress", // Com um agente
     BANNED = "banned", // Baniu
     FAILED = "failed" // Zerou o saldo
@@ -174,7 +175,7 @@ const AccountsSchemaMongoose = new Schema<AccountsSchema>({
     vipLevel: { type: Number, default: 0 },
     needPhone: { type: Boolean, default: false },
     source: { type: String, default: null },
-    status: { type: String, enum: AccountStatusEnum, default: AccountStatusEnum.CREATED },
+    status: { type: String, enum: AccountStatusEnum, default: AccountStatusEnum.IDLE },
     state: { type: String, enum: AccountStateEnum, default: AccountStateEnum.PENDING },
     stateReason: { type: String, default: "" },
     balance: { type: Number, default: 0 },

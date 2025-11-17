@@ -52,6 +52,13 @@ const config = convict({
             doc: "",
             env: "ACTIVATE_API_KEY"
         }
+    },
+    redis: {
+        url: {
+            default: "",
+            doc: "",
+            env: "REDIS_URL"
+        }
     }
 })
 

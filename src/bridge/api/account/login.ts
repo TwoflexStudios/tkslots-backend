@@ -15,7 +15,7 @@ interface LoginSuccess {
     password: string;
 }
 
-const ApiLogin = async (_account: AccountsSchema | string, useAccountProxySession = false): Promise<LoginError | LoginSuccess> => {
+const ApiLogin = async (_account: AccountsSchema | string, useAccountProxySession = false, proxyAgent?: any): Promise<LoginError | LoginSuccess> => {
 
     let account: AccountsSchema | null = null;
 
@@ -39,7 +39,7 @@ const ApiLogin = async (_account: AccountsSchema | string, useAccountProxySessio
 
     const siteInfo = await sitesModel.findOne({ _id: account.siteId });
 
-    const proxy = getProxyAgent(useAccountProxySession ? proxySession : crypto.randomUUID());
+    const proxy = proxyAgent || getProxyAgent(useAccountProxySession ? proxySession : crypto.randomUUID());
 
     if (!siteInfo) {
         return { status: false, message: "Site inválido" }

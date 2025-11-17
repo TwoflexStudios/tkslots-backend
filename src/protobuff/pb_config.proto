@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package pb_config;
+
+message cs_server_cfg_msg {
+  int32 platform = 1;
+}
+
+message sc_server_cfg_msg {
+  int64 BindMobileRewardMoney = 1;
+  int32 ModifyNickNameTimes = 2;
+  int32 ModifyLogoTimes = 3;
+  int32 MaxNickNameLen = 4;
+  string DefaultCurrency = 5;
+  string DefaultCurrencySymbol = 6;
+  string ChargeBoundary = 7;
+  int64 ChargeMinAmount = 8;
+  int64 ChargeMaxAmount = 9;
+  string ServicePhone = 10;
+  int32 FirstRechargeSwitch = 11;
+  string ApkDownloadUrl = 12;
+  string ApkVersion = 13;
+  string ApkPackName = 14;
+  int32 ApkVersionCode = 15;
+  int32 NeedBindPhone = 16;
+}

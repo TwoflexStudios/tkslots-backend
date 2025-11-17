@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package pb_lobby_personal;
+
+message cs_modify_nikename_msg {
+  string name = 1;
+}
+
+message cs_modify_logo_msg {
+  int32 logo = 1;
+}
+
+message cs_base_info {}
+
+message sc_base_info {
+  int32 modifyLogoTimes = 1;
+  int32 modifyNameTimes = 2;
+}

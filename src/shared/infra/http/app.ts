@@ -1,17 +1,19 @@
 import express from "express";
 import cors from "cors";
 import routes from "./routes/base";
+import { BullMonitorExpress } from "tk-monitor/src/express";
+import { BullMQAdapter } from "tk-monitor/src/root/bullmq-adapter";
+import { BindQueue, CheckinQueue } from "../../../bull/queues";
 
 class App {
-
     private app: express.Application;
 
-    constructor(){
+    constructor() {
         this.app = express();
         this.customize();
     }
 
-    customize(){
+    customize() {
         this.app.use(express.json());
         this.app.use(cors({
             origin: "*"
@@ -19,8 +21,26 @@ class App {
         this.loadRoutes();
     }
 
-    loadRoutes(){
+    loadRoutes() {
         this.app.use("/", routes);
+
+        const monitor = new (BullMonitorExpress as any)({
+            queues: [
+                new BullMQAdapter(BindQueue as any),
+                new BullMQAdapter(CheckinQueue as any),
+            ],
+            gqlIntrospection: true,
+            metrics: {
+                collectInterval: { hours: 1 },
+                maxMetrics: 100,
+                blacklist: ['1'],
+            },
+        });
+        
+
+        monitor.init().then(() => {
+            this.app.use("/tk-queue", monitor.router as any);
+        });
 
         this.app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
             console.error(err); // para logar no console do servidor
@@ -44,7 +64,7 @@ class App {
         });
     }
 
-    listen(port: number){
+    listen(port: number) {
         this.app.listen(port, () => {
             console.log(`🚀 App running at port: ${port}`)
         })

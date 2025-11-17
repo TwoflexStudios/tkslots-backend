@@ -1,0 +1,84 @@
+syntax = "proto3";
+
+package pb_lobby_freerechagre;
+
+// ====== config_data ======
+message config_data {
+  int64 min = 3;      // valor mínimo
+  int64 max = 4;      // valor máximo
+  int32 counts = 5;   // contagem
+}
+
+// ====== sc_data_from_config ======
+message sc_data_from_config {
+  int32 targetmoney = 1;
+  int32 beginmoneymax = 2;
+  int32 beginmoneymix = 3;
+  int32 days = 4;
+  int32 InvitationPepole = 5;
+  int32 FinshTaskDays = 6;
+  int32 FinshTaskCount = 7;
+  repeated config_data configdata = 8;
+}
+
+// ====== sc_showbefore_msg ======
+message sc_showbefore_msg {
+  int32 status = 1;
+  int64 complatemoney = 4;
+}
+
+// ====== sc_freerechagre_get ======
+message sc_freerechagre_get {
+  int64 money = 1;
+}
+
+// ====== all_recode_data ======
+message all_recode_data {
+  string name = 1;
+  int64 money = 2;
+}
+
+// ====== sc_getfree_msg ======
+message sc_getfree_msg {
+  int64 endtime = 1;
+  repeated all_recode_data recodedata = 2;
+  int32 freecounts = 3;
+  int64 complatemoney = 4;
+  int64 mymoney = 5;
+  string sharedurl = 6;
+  bool bsharephone = 7;
+  int32 betx = 8;
+}
+
+// ====== sc_rota_msg ======
+message sc_rota_msg {
+  int64 money = 1;
+}
+
+// ====== cs_my_recode_msg ======
+message cs_my_recode_msg {
+  int32 page = 1;
+  int32 count = 2;
+}
+
+// ====== my_recode_data ======
+message my_recode_data {
+  string name = 1;
+  int32 money = 2;
+}
+
+// ====== sc_my_recode_msg ======
+message sc_my_recode_msg {
+  repeated my_recode_data data = 1;
+}
+
+// ====== sc_get_all_money_msg ======
+message sc_get_all_money_msg {
+  int64 money = 1;
+}
+
+// ====== sc_new_help_msg ======
+message sc_new_help_msg {
+  string name = 1;
+  int32 counts = 2;
+}

@@ -1,0 +1,86 @@
+syntax = "proto3";
+
+package pb_lobby_mall;
+
+message cs_payitem_list {}
+message sc_payitem_list {
+  repeated pay_item list = 1;
+}
+
+message cs_pay_item {
+  int32 id = 1;
+}
+message sc_pay_item {
+  int32 id = 1;
+  int32 code = 2;
+  string msg = 3;
+}
+
+message pay_item {
+  int32 id = 1;
+  int64 originalGold = 2;
+  int64 realGold = 3;
+  int32 present = 4;
+  int64 originalPrice = 5;
+  int64 realPrice = 6;
+  int32 type = 8;
+  int32 flag = 9;
+  int32 discount = 10;
+  int32 startTimeStamp = 11;
+  int32 durationTime = 12;
+  int32 vip = 13;
+  int32 sortid = 14;
+}
+
+message notify_falsh_sale {
+  repeated pay_item list = 1;
+}
+
+message cs_charge_for_coin {
+  int32 id = 1;
+}
+message sc_charge_for_coin {
+  int32 code = 1;
+  string msg = 2;
+}
+
+message cs_charge_buy_coin {
+  int32 id = 1;
+}
+message sc_charge_buy_coin {
+  int32 code = 1;
+  string msg = 2;
+}
+
+message cs_charge_histroy {
+  int32 number = 1; // número de registros por página
+  int32 page = 2;   // número da página
+}
+
+message sc_charge_histroy {
+  repeated charge_record list = 1;
+}
+
+message charge_record {
+  string orderNo = 1;  // número do pedido
+  int64 coins = 2;     // quantidade de moedas
+  int32 orderTime = 3; // timestamp da criação
+  int64 amount = 4;    // valor pago
+  int32 state = 5;     // estado da transação
+  string csUrl = 6;    // URL de atendimento ao cliente
+  string payUrl = 7;   // URL de pagamento (opcional)
+  int32 typeId = 8;    // ID do tipo de pagamento
+  string name = 9;     // nome do produto ou pacote
+}
+message sc_get_first_gift {
+  int32 result = 1;
+}
+
+message sc_first_gift_info_msg {
+  int32 giftID = 1;
+  string giftDesc = 2;
+}
+
+message sc_payitem_base_info_msg {
+  repeated pay_item list = 1;
+}

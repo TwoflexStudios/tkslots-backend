@@ -1,0 +1,81 @@
+syntax = "proto3";
+
+package pb_lobby_withdraw;
+
+message cs_bank_card_bind_msg {
+  string bankCardInfo = 1;
+  string email = 2;
+}
+
+message cs_bank_card_withdraw_msg {
+  string category = 1;
+  int64 money = 2;
+  string Password = 3;
+}
+
+message cs_query_upiaccount {
+  string upiaccount = 1;
+}
+
+// Estrutura genérica do cartão/bind info
+message card_info {
+  string type = 1;      // tipo do canal / forma de pagamento
+  string account = 2;   // identificador da conta ou número do cartão
+  string data = 3;      // JSON string com os dados do cartão
+}
+
+// Mensagem cliente -> servidor para atualizar cartão
+message cs_update_card_info {
+  string oldaccount = 1;   // conta antiga
+  string oldtype = 2;      // tipo antigo
+  card_info carddata = 3;  // novo cartão
+  string verifyCode = 4;   // código de verificação, se houver
+}
+
+// Mensagem servidor -> cliente com atualização de cartão
+message sc_update_card_info {
+  repeated card_info bankCardInfo = 1; // lista de cartões vinculados
+}
+
+message sc_bank_card_info_msg {
+  string bankCardInfo = 1;
+  int64 MinWithDrawCoins = 2;
+  int64 MinCoinsLeft = 3;
+  int64 HitBet = 4;
+  string transModeList = 5;
+  bool bBindEmail = 6;
+  int32 transdaylimit = 7;
+  int64 MaxWithDrawCoins = 8;
+  int32 withdrawmul = 9;
+  int32 fixbindCard = 10;
+  int32 fixCode = 11;
+  int32 feeRate = 12;
+  int32 feeCount = 13;
+  int32 firstbindcode = 14;
+}
+
+
+message cs_bank_withdraw_history {
+  int32 number = 1;
+  int32 page = 2;
+}
+
+message sc_bank_withdraw_history {
+  repeated struct_bank_withdraw_history history = 1;
+  int32 page = 2;
+  int32 maxnumber = 3;
+}
+
+message struct_bank_withdraw_history {
+  string transNo = 1;   // número da transação
+  string cardNo = 2;    // número do cartão
+  int64 coins = 3;      // quantidade de moedas
+  int64 timeStamp = 4;  // timestamp da transação
+  int32 state = 5;      // estado (provável: 0=pendente, 1=aprovado, 2=rejeitado)
+  string remark = 6;    // observação
+}
+
+message sc_bank_card_withdraw_msg {
+  int32 result = 1;
+  string message = 2;
+}

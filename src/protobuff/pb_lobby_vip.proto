@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package pb_lobby_vip;
+
+message VipRuleItem {
+  int32 level = 1;
+  int64 levelupExp = 2;
+  int64 levelupGift = 3;
+  int64 weekGift = 4;
+  int64 monthGift = 5;
+  int32 signToneup = 6;
+  int32 isTransferSpeed = 7;
+  int32 isService = 8;
+  int64 weekMinCharge = 9;
+  int64 monthMinCharge = 10;
+}
+
+message sc_vip_rules {
+  repeated VipRuleItem items = 1;
+}
+
+message sc_vip_status {
+  int32 level = 1;
+  int64 curExp = 2;
+  int64 needExp = 3;
+  int64 weekCharge = 4;
+  int64 monthCharge = 5;
+}
+
+message cs_get_gift {
+  int32 type = 1;
+}
+
+message sc_get_result {
+  int32 code = 1;
+}

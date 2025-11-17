@@ -25,7 +25,7 @@ class AccountsController {
 
                 if (siteId) filters.siteId = siteId;
                 filters.status = { $in: status || [AccountStatusEnum.READY] };
-                filters.state = { $in: state || [AccountStateEnum.DONE] };
+                filters.state = { $in: state || [AccountStatusEnum.DONE] };
 
                 const skip = (numericPage - 1) * numericLimit;
 
@@ -60,7 +60,7 @@ class AccountsController {
     static createTestAccount() {
         return async (req: Request, res: Response) => {
             const [deviceId, hash, gpsId] = getRandomDeviceId(PlatformEnum.ANDROID);
-            const account = await CreateAccount("69193a13069e926656f3e810", {
+            const account = await CreateAccount("69193ce63d60ea0db64e4e2d", {
                 mode: AccountLoginTypeEnum.GUEST,
                 needPhone: true,
                 device: {

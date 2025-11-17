@@ -1,0 +1,59 @@
+syntax = "proto3";
+
+package pb_game;
+
+message cs_gameroom_list {
+  int32 gameId = 1;
+}
+
+message sc_gameroom_list {
+  repeated gameroom_info rooms = 1;
+}
+
+message gameroom_info {
+  int32 roomId = 1;
+  string roomName = 2;
+  int32 roomType = 3;
+  int32 playerCount = 4;
+  int32 roomStatus = 5;
+  int32 minEnter = 6;
+  int32 maxEnter = 7;
+}
+
+message cs_askenterroom {
+  int32 gameId = 1;
+  int32 roomId = 2;
+}
+
+message sc_askenterroom {
+  string serverIp = 1;
+  int32 socketPort = 2;
+  int32 gameNameId = 3;
+  string gameName = 4;
+  int32 gameRoomId = 5;
+  int32 limitbet = 6;
+}
+message sc_game_list {
+  repeated game_info games = 1;
+}
+
+message game_info {
+  int32 gameId = 1;
+  string gameName = 2;
+  int32 sort = 3;
+  int32 kindId = 4;
+  int32 isRoom = 5;
+  int32 tag = 6;
+  int32 viplv = 7;
+  int32 gameType = 8;
+}
+
+message notify_game_jackport {
+  int32 gameId = 1;
+  int64 jackpot = 2;
+}
+
+message notify_need_enter_game {
+  int32 gameId = 1;
+  int32 roomId = 2;
+}

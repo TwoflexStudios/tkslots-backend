@@ -1,0 +1,52 @@
+syntax = "proto3";
+
+package pb_lobby_signin;
+
+message signin_state {
+  int32 coin = 1;
+  int32 curCoin = 2;
+  int32 state = 3;
+  int32 day = 4;
+}
+
+message week_reward {
+  int32 coin = 1;
+  int32 curCoin = 2;
+  int32 state = 3;
+}
+
+message sc_signin_list {
+  int32 curday = 1;
+  repeated signin_state states = 2;
+  int32 toneup = 3;
+  int32 vlevel = 4;
+}
+
+message sc_signin_base {
+  int32 curday = 1;
+  repeated signin_state states = 2;
+  repeated week_reward weekreward = 3;
+  int32 toneup = 4;
+  int32 vlevel = 5;
+}
+
+message sc_sigin_result {
+  int32 coin = 1;
+  int32 curCoin = 2;
+  int32 state = 3;
+}
+
+message sc_signin_result_ex {
+  int32 coin = 1;
+  int32 curCoin = 2;
+  int32 state = 3;
+  int32 day = 4;
+}
+
+message cs_week_reward {
+  int32 week = 1;
+}
+
+message sc_week_reward {
+  int32 coin = 1;
+}

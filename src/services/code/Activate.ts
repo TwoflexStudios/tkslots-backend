@@ -1,4 +1,4 @@
-import axios, { AxiosInstance } from "axios";
+import axios, { Axios } from "axios";
 import config from "../../config/convict";
 import { Delay } from "../../helpers/delay";
 import { CodeEventsEnum } from "../../globals/enums/CodeEventsEnum";
@@ -8,9 +8,7 @@ interface ModuleOptions {
     service: string;
     country: string;
     price: {
-        from?: number;
         max?: number;
-        providerId?: number;
     }
 }
 
@@ -25,76 +23,45 @@ interface GetPhoneNumberResponse {
 }
 
 
-class BowerModule {
 
-    private api: AxiosInstance;
+class SMSActivateModule {
+
+    //@ts-ignore
+    private api: Axios;
     private retryCount = 0;
     private codeMonitorInterval: any;
+    private events: {
+        [key: string]: ((...args: any[]) => void)[]
+    } = {}
 
     constructor() {
         this.api = axios.create({
-            baseURL: "https://smsbower.online",
+            baseURL: "https://api.sms-activate.ae/stubs/handler_api.php",
         })
 
-        this.api.interceptors.request.use(_config => {
+        this.api.interceptors.request.use((_config: any) => {
             _config.params = {
                 ..._config.params,
-                api_key: config.get("bower.apiKey")
+                api_key: config.get("activate.apiKey")
             }
 
             return _config;
         })
 
-        this.api.interceptors.response.use((res) => res, (err) => {
+        this.api.interceptors.response.use((res: any) => res, (err: any) => {
             console.log(err.response)
         })
     }
-
-    async getProvider(options: ModuleOptions): Promise<null | string> {
-        let providerId = null;
-
-        if (options.price.providerId) {
-            return String(options.price.providerId);
-        }
-
-        if (options.price.from) {
-            const { data: prices } = await this.api.get("", {
-                params: {
-                    action: "getPricesV3",
-                    service: options.service,
-                    country: options.country,
-                }
-            })
-
-
-            const price = Object.keys(prices[options.country][options.service]);
-            let oldCount = 0;
-
-            for (let i = 0; i < price.length; i++) {
-                const priceCode: any = price[i];
-                const priceContent = prices[options.country][options.service][priceCode];
-
-                if (priceContent.count > oldCount && priceContent.price === Number(options.price.from)) {
-                    providerId = priceContent.provider_id;
-                }
-            }
-        }
-
-        return providerId;
-    }
-
     async getPhoneNumber(options: ModuleOptions): Promise<GetPhoneNumberResponse | GetPhoneNumberErrorResponse> {
-        let providerId = await this.getProvider(options);
-
         const payload = {
             action: "getNumberV2",
             service: options.service,
             country: options.country,
-            ...(options.price.max && { maxPrice: options.price.max }),
-            ...(providerId && { providerIds: providerId })
+            fixedPrice: true,
+            ...(options.price.max && { maxPrice: Number(options.price.max) }),
         }
 
-        const { data: response } = await this.api.get("/stubs/handler_api.php", {
+        const { data: response } = await this.api.get("", {
             params: payload
         })
 
@@ -209,10 +176,6 @@ class BowerModule {
         check();
     }
 
-    private events: {
-        [key: string]: ((...args: any[]) => void)[]
-    } = {}
-
     on(event: CodeEventsEnum, listener: (...args: any[]) => void) {
         if (!this.events[event]) {
             this.events[event] = []
@@ -229,4 +192,4 @@ class BowerModule {
 
 }
 
-export default BowerModule;
+export default SMSActivateModule;

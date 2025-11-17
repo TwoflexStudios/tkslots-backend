@@ -1,0 +1,52 @@
+syntax = "proto3";
+
+package pb_lobby;
+
+message sc_showbefore_msg {
+  int64 begintime = 1;
+  int64 starttime = 2;
+  int64 endtime = 3;
+  int32 status = 4;
+  int64 money = 5;
+}
+
+// message sc_getfree_msg {
+//   int64 money = 1;
+//   int32 rotaCount = 2;
+//   int32 todayMaxCount = 3;
+//   int64 totalGet = 4;
+// }
+
+message sc_rota_msg {
+  int64 result = 1;
+  int32 rotaCount = 2;
+}
+
+message sc_my_recode_msg {
+  repeated int64 records = 1;
+}
+
+message sc_get_all_money_msg {
+  int64 total = 1;
+  int64 received = 2;
+}
+
+message sc_new_help_msg {
+  bool hasNew = 1;
+}
+
+message sc_get_my_money_recode_msg {
+  repeated int64 records = 1;
+}
+
+message sc_get_sharephone {
+  string phone = 1;
+}
+
+message cs_my_recode_msg {
+  int32 uid = 1;
+}
+
+message cs_get_my_money_recode_msg {
+  int32 uid = 1;
+}

@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+package pb_lobby_mail;
+
+message lobby_mail_prop {
+  int32 propID = 1;
+  int64 propCount = 2;
+}
+
+message lobby_mail_msg {
+  int64 mailid = 1;
+  string title = 2;
+  int64 timestamp = 3;
+  bool bOpen = 4;
+  string sender = 5;
+  int32 type = 6;
+  bool bGet = 7;
+  string content = 8;
+}
+
+message lobby_mail_list_msg {
+  repeated lobby_mail_msg mailList = 1;
+}
+
+message cs_mail_open {
+  int64 mailid = 1;
+}
+
+message sc_mail_open {
+  int64 mailid = 1;
+  string content = 2;
+  int64 timestamp = 3;
+  repeated lobby_mail_prop prop = 4;
+  int32 type = 5;
+}
+
+message cs_mail_delete {
+  int64 mailid = 1;
+}
+
+message sc_mail_delete {
+  int64 mailid = 1;
+}
+
+message cs_mail_getprop {
+  int64 mailid = 1;
+}
+
+message sc_mail_getprop {
+  int64 mailid = 1;
+  int32 status = 2;
+  repeated lobby_mail_prop prop = 3;
+  repeated int64 curUserScore = 4;
+}
+
+message cs_mail_sysmailid {}
+
+message sc_mail_sysmailid {
+  repeated int64 mailid = 1;
+}

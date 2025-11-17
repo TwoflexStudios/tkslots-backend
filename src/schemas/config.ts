@@ -5,20 +5,18 @@ export enum SmsProviderEnum {
     ACTIVATE = "activate"
 }
 
-interface ConfigSchema {
-    providers: [
-        {
-            provider: SmsProviderEnum;
-            apiKey: string;
-        }
-    ];
+export interface ConfigSchema {
     sms: {
         provider: SmsProviderEnum;
-        service: string;
-        price: {
-            max?: number;
-            from?: number;
-            providerId?: string;
+        payload: {
+            retry?: number;
+            service: string;
+            country: string;
+            price: {
+                from?: string;
+                max?: string;
+                providerId?: string;
+            }
         }
     }
     createdAt: Date;
@@ -32,22 +30,32 @@ const ConfigModel = new Schema<ConfigSchema>({
             enum: SmsProviderEnum,
             default: SmsProviderEnum.ACTIVATE
         },
-        service: {
-            type: String,
-            default: ""
-        },
-        price: {
-            max: {
+        payload: {
+            retry: {
                 type: Number,
-                default: 0
+                default: 3
             },
-            from: {
-                type: Number,
-                default: 0
-            },
-            providerId: {
+            service: {
                 type: String,
                 default: ""
+            },
+            country: {
+                type: String,
+                default: ""
+            },
+            price: {
+                max: {
+                    type: String,
+                    default: "0"
+                },
+                from: {
+                    type: String,
+                    default: "0"
+                },
+                providerId: {
+                    type: String,
+                    default: ""
+                }
             }
         }
     },

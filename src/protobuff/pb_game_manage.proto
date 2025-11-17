@@ -1,0 +1,126 @@
+syntax = "proto3";
+
+package pb_game_manage;
+
+message cs_room_logon {
+  int32 nameID = 1;
+  int32 userID = 2;
+  int32 roomVer = 3;
+  int32 gameVer = 4;
+  string md5Pass = 5;
+  string session = 6;
+}
+
+message sc_room_logon_result {
+  int32 userID = 1;
+  int32 point = 2;
+  int64 money = 3;
+  int64 bank = 4;
+  int32 logoID = 5;
+  int32 deskNo = 6;
+  int32 deskStation = 7;
+  int32 userState = 8;
+  string nickName = 9;
+}
+
+message cs_game_switch_bet {
+  int32 score = 1;
+}
+
+message sc_game_switch_bet {
+  int32 code = 1;
+}
+
+message sc_game_info {
+  int32 deskNo = 1;
+  int32 deskStation = 2;
+  int64 money = 3;
+  int32 betScore = 4;
+}
+
+message notify_user_info {
+  int32 userID = 1;
+  int32 point = 2;
+  int64 money = 3;
+  int64 bank = 4;
+  int32 logoID = 5;
+  int32 deskNo = 6;
+  int32 deskStation = 7;
+  int32 userState = 8;
+  string nickName = 9;
+  int64 loginIP = 10;
+}
+
+message notify_desk_players {
+  repeated notify_user_info list = 1;
+}
+
+message notify_game_jackpot {
+  int32 gameId = 1;
+  int64 jackpot = 2;
+}
+
+message notify_game_win_score_notice_msg {
+  int32 type = 1;
+  string userName = 2;
+  string gameName = 3;
+  int64 winScore = 4;
+  int32 logo = 5;
+  int64 timestamp = 6;
+  int32 multiple = 7;
+  int32 roomId = 8;
+  int32 gameId = 9;
+  int32 viplv = 10;
+}
+
+message notify_game_grade_info {
+  repeated int32 scoreList = 1;
+}
+
+message notify_userinfo_update {
+  int64 money = 1;
+  int64 bank = 2;
+  int32 vipLevel = 3;
+  int64 vipExp = 4;
+  string name = 5;
+  int32 logoId = 6;
+  int32 type = 7;
+  int64 changed = 8;
+  string phoneNo = 9;
+  string areaCode = 10;
+}
+
+message sc_jackpot_winner_list {
+  repeated notify_game_win_score_notice_msg winners = 1;
+}
+
+message sc_bet_forbid_msg {
+  int32 forbid = 1;
+}
+
+message notify_kick_warn_msg {
+  int32 param = 1;
+}
+
+message notify_user_recharge_result_info {
+  int32 firstRecharge = 1;
+  int64 rechargeCoins = 2;
+  int64 rechargeCash = 3;
+}
+
+message sc_notice_marquee {
+  repeated notify_game_win_score_notice_msg noticelist = 1;
+}
+
+message sc_other_userSit {
+  int32 userID = 1;
+  int32 deskNo = 2;
+  int32 deskStation = 3;
+  string nickName = 4;
+  int32 logoID = 5;
+}
+
+message sc_other_userCut {
+  int32 userID = 1;
+  int32 deskNo = 2;
+}
