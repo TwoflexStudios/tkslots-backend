@@ -1,5 +1,5 @@
 import { EventEmitter } from "stream";
-import { Server2ClientCommands } from "../../helpers/commands";
+import { Client2ServerCommands, Server2ClientCommands } from "../../helpers/commands";
 
 abstract class GameSocketEventEmitter extends EventEmitter {
     protected constructor() {
@@ -15,6 +15,7 @@ abstract class GameSocketEventEmitter extends EventEmitter {
         // do stuff here
         return super.on(event as any, listener);
     }
+
     once<K extends keyof typeof Server2ClientCommands | symbol>(event: K, listener: (...args: any) => void) {
         // do stuff here
         return super.once(event as any, listener);

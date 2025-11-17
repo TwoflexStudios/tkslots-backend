@@ -5,11 +5,7 @@ import fs from "fs";
 
 class GameProtocolHelper {
     public protobuff: protobuf.Root = new protobuf.Root();
-    
-    constructor(){
-
-    }
-
+   
     getHeadlen = () => 20
 
     getHeartBeatCmd = () => ({ mainID: 1, aID: 1 })
@@ -121,7 +117,7 @@ class GameProtocolHelper {
             try {
                 const pbType = this.protobuff.root.lookupType(command.pak);
                 data = pbType.decode(payload);
-                console.log(`[PROTOBUF]: ${pbType.name} decodificando dados de ${command.name}`);
+                // console.log(`[PROTOBUF]: ${pbType.name} decodificando dados de ${command.name}`);
             } catch (err) {
                 // console.warn('[PROTOBUF] ❌ Falha ao decodificar a resposta:', err.message);
                 data = {};

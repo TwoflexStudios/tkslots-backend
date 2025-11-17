@@ -1,4 +1,12 @@
 export const Server2ClientCommands = {
+    "user-logged": {
+        'name': '',
+        'mainID': -1,
+        'aID': -1,
+        'pak': '',
+        'file': '',
+        'command': -1
+    },
     "connectVerified": {
         "name": "s2c_heart",
         "mainID": 1,

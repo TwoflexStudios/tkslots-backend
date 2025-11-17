@@ -11,6 +11,7 @@ interface SocketBridgeOptions {
     heartBeat?: boolean;
     proxyAgent?: any;
     channel?: ChannelEnum;
+    disabledTimeout?: boolean;
 }
 
 const channels = {
@@ -43,7 +44,8 @@ class GameSocketBridge extends GameSocketEventEmitter {
     constructor(url: string, protocolHelper: GameProtocolHelper, options: SocketBridgeOptions = {
         heartBeat: true,
         proxyAgent: null,
-        channel: ChannelEnum.LOBBY
+        channel: ChannelEnum.LOBBY,
+        disabledTimeout: false
     }) {
         super();
         this.url = url;
@@ -62,7 +64,7 @@ class GameSocketBridge extends GameSocketEventEmitter {
     //@Override este método é chamado quando houver um erro na conexão
     onError(){}
     //@Override este método é chamado quando tiver uma mensagem
-    onAnyMessage(data: any, decoded: GameSocketResponse){}
+    onServerMessage(command: string | null, decoded: GameSocketResponse){}
 
     async init() {
         this.socket = new WebSocket(this.url, { agent: this.options.proxyAgent });
@@ -79,6 +81,8 @@ class GameSocketBridge extends GameSocketEventEmitter {
             this.log(`Socket fechado, motivo: ${code}`)
             this.connected = false;
             this.onClose();
+            clearInterval(this._keepAliveTimer);
+            clearTimeout(this._receiveMsgTimer);
         });
 
         this.socket.on('error', (err) => {
@@ -96,9 +100,9 @@ class GameSocketBridge extends GameSocketEventEmitter {
     }
 
     //Enviar um packet (Pacote do jogo) via socket
-    request<R = any, P = any>(
+    request<R = any, D = any>(
         action: keyof typeof Client2ServerCommands,
-        packet: Packet<P>,
+        packet: Packet<D>,
         callback?: (data: GameSocketResponse<R>) => void,
         track: boolean = true,
         urgent: boolean = false
@@ -139,16 +143,31 @@ class GameSocketBridge extends GameSocketEventEmitter {
         }
     }
 
-    log(value: string, type: "info" | "warn" | "error" | "debug" | "success" = "info"){
+    async requestAsync<R = any, P = any>(
+        action: keyof typeof Client2ServerCommands,
+        packet: Packet<P>,
+    ): Promise<GameSocketResponse<R> | "TIMEOUT"> {
+        return new Promise(resolve => {
+            this.request(action, packet, (res) => {
+                resolve(res as any)
+            });
+
+            setTimeout(() => {
+                resolve("TIMEOUT")
+            }, 10000);
+        })
+    }
+
+    private log(value: string, type: "info" | "warn" | "error" | "debug" | "success" = "info"){
         logger[type](`[${channels[this.options.channel || ChannelEnum.LOBBY]}:GAMESOCKET]: ${value}`)
     }
 
-    hasVerify() {
+    private hasVerify() {
         return this.safeCode > 0;
     }
 
     //Codificar buffer com safeCode
-    encodeReqBuffer(buffer: Buffer) {
+    private encodeReqBuffer(buffer: Buffer) {
         if (this.hasVerify()) {
             const encoded = Buffer.alloc(buffer.length);
             for (let i = 0; i < buffer.length; i++) {
@@ -161,7 +180,7 @@ class GameSocketBridge extends GameSocketEventEmitter {
     }
 
     //Decodificar buffer com safeCode
-    decodeRespBuffer(buffer: Buffer) {
+    private decodeRespBuffer(buffer: Buffer) {
         if (this.hasVerify()) {
             const decoded = Buffer.alloc(buffer.length);
             for (let i = 0; i < buffer.length; i++) {
@@ -173,7 +192,7 @@ class GameSocketBridge extends GameSocketEventEmitter {
         return buffer;
     }
 
-    buildAuthBuffer() {
+    private buildAuthBuffer() {
         const ts = Math.floor(Date.now() / 1000);
         const md5Hex = crypto.createHash('md5').update(`${ts}${this.localKey}:<>:`).digest('hex');
         const md5Bin = Buffer.from(md5Hex, 'hex'); // 16 bytes, MD5 é 128 bits
@@ -197,7 +216,7 @@ class GameSocketBridge extends GameSocketEventEmitter {
     }
 
     //Quando o socket for aceito pelo servidor
-    onSocketVerified(){
+    private onSocketVerified(){
         this.connected = true;
         this.emit('connectVerified');
         this.resetHeartbeatTimer();
@@ -205,7 +224,7 @@ class GameSocketBridge extends GameSocketEventEmitter {
     }
 
     //Função para enviar uma solicitação de verificação de conexão comando: connectVerify
-    connectVerify() {
+    private connectVerify() {
         const authData = this.buildAuthBuffer();
 
         const header = {
@@ -234,7 +253,7 @@ class GameSocketBridge extends GameSocketEventEmitter {
     }
 
     //Função para calcular o safeCode baseado na resposta do servidor na solicitação de connectVerify
-    onSocketVerify(resp: GameSocketResponse) {
+    private onSocketVerify(resp: GameSocketResponse) {
         const offset = 4
         if (resp.header.bHandleCode === 0) {
             let data = resp.data;
@@ -265,7 +284,7 @@ class GameSocketBridge extends GameSocketEventEmitter {
     }
 
     //Função para processar a resposta do servidor
-    onMessage(raw: Buffer) {
+    private onMessage(raw: Buffer) {
         this.resetReceiveMsgTimer(); // Reseta o relogio de timeout
 
         const decoded = this.decodeRespBuffer(raw);
@@ -281,7 +300,7 @@ class GameSocketBridge extends GameSocketEventEmitter {
             return;
         }
 
-        this.log(`RCV: ${response.cmdName}, ${response.data}`, "debug")
+        this.log(`RECV: ${response.cmdName}, ${response.data}`, "debug")
 
         const match = this._requests.find(r => r.cmd === response.cmd || r.cmdName === response?.command?.name);
         
@@ -297,11 +316,11 @@ class GameSocketBridge extends GameSocketEventEmitter {
             this.emit(String(response.command.name), response)
         }
         this.emit('message', response);
-        this.onAnyMessage(raw, response);
+        this.onServerMessage(String(response.command.name), response);
     }
 
     //Função para enviar buffer via socket
-    send(data: Buffer) {
+    private send(data: Buffer) {
         if (this.socket && this.socket.readyState === WebSocket.OPEN) {
             this.socket.send(data);
         } else {
@@ -312,14 +331,15 @@ class GameSocketBridge extends GameSocketEventEmitter {
     // ---------------------------------------
     // Heartbeat
     // ---------------------------------------
-    resetHeartbeatTimer() {
+    private resetHeartbeatTimer() {
         if (this._keepAliveTimer) clearInterval(this._keepAliveTimer);
         if (this.options.heartBeat) {
             this._keepAliveTimer = setInterval(() => this.sendHeart(), this.heartTime);
         }
     }
 
-    resetReceiveMsgTimer(time = this.timeoutTime) {
+    private resetReceiveMsgTimer(time = this.timeoutTime) {
+        if (this.options.disabledTimeout) return;
         if (this._receiveMsgTimer) clearTimeout(this._receiveMsgTimer);
         this._receiveMsgTimer = setTimeout(() => {
             //Se não receber mensagem em 2 minutos, fecha o socket
@@ -329,8 +349,8 @@ class GameSocketBridge extends GameSocketEventEmitter {
         }, time);
     }
 
-    sendHeart() {
-        if (!this.options.heartBeat) return;
+    private sendHeart() {
+        if (!this.options.heartBeat || !this.connected) return;
         this.log(`💞 Heartbeat`, "debug")
         const hb = this.protocolHelper.getHeartBeatCmd(); // { mainID, aID }
         const header = {

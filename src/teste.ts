@@ -3,44 +3,19 @@ import GameProtocolHelper from "./bridge/protocol/GameProtocolHelper";
 import AccountsModel from "./schemas/accounts";
 import ApiLogin from "./bridge/api/account/login";
 import { getProxyAgent } from "./helpers/proxy";
+import Player from "./bridge/Player";
 
 const DevelopFunction = async () => {
-    const agent = getProxyAgent();
-    const account = await AccountsModel.findOne({_id: "69198ed1a4d8a78300da5f45"});
-
-    if(!account) return;
-
-    const protocolHelper = new GameProtocolHelper();
-    await protocolHelper.loadFromFolder("./src/protobuff/");
+    const player = new Player("691abdf0ce62648bbd365d59");
     
-    const socket = new GameSocketBridge("wss://wss.king699.com", protocolHelper, {
-        heartBeat: true,
-        proxyAgent: agent
-    });
+    const loginResult = await player.connect();
 
-    const login = await ApiLogin(account, false, agent);
-
-    if(!login.status){
+    if(!loginResult.status){
+        console.log(loginResult.message, "Erro ao conectar")
         return;
     }
 
-    socket.onReady = () => {
-        socket.request("c2s_lobby_login", {
-            data: {
-                ab: 100,
-                account: login.account,
-                password: login.password,
-                deviceCode: account.login.device.id,
-                deviceType: account.login.device.platform,
-            }
-        }, ({data}) => {
-            console.log(data)
-            socket.close();
-        })
-    }
-
-    await socket.init();
-    
+    console.log("Conectado")
 }
 
 export default DevelopFunction;

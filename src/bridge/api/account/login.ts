@@ -83,17 +83,14 @@ const ApiLogin = async (_account: AccountsSchema | string, useAccountProxySessio
 
     try {
         const { data } = await api.post(`/login`, payloadEncoded)
-
         await AccountsModel.updateOne(
             { _id: (account as any)._id },
             {
                 $set: {
                     uid: Number(data.account.split("User")[1]),
                     username: data.account,
-                    "login.socketLogin": {
-                        account: data.account,
-                        password: data.password
-                    }
+                    "login.socket.account": data.account,
+                    "login.socket.password": data.password
                 }
             }
         )

@@ -12,6 +12,7 @@ export enum AccountStateEnum {
     BINDING = "binding", // Bindando telefone
     PENDING = "pending", // Criada (Fila de bind vai puxar depois)
     READY = "ready", // Pronto pra ser puxada por qualquer fila
+    BANNED = "banned", // Baniu
 
     //Errors das filas
     BIND_FAILED = "bind_failed",
@@ -74,9 +75,11 @@ export interface AccountLoginInfo {
         platform: PlatformEnum;
         hash: string;
     };
-    socketLogin: {
+    socket: {
+        session?: string;
         account: string;
         password: string;
+        sessionDate?: Date;
     };
     proxySession: string;
 }
@@ -109,6 +112,7 @@ export interface AccountsSchema {
     deposits: AccountDeposits[];
     withdraws: AccountsWithdraws[];
     states: AccountState;
+    checkinDay: number;
     lastCheckin: Date | null;
     createdAt: Date;
     updatedAt: Date;
@@ -145,9 +149,11 @@ const AccountLoginInfoSchema = new Schema<AccountLoginInfo>({
         hash: { type: String, required: true },
         platform: { type: Number, enum: PlatformEnum, required: true }
     },
-    socketLogin: {
+    socket: {
+        session: {type: String, default: null},
         account: { type: String },
-        password: { type: String }
+        password: { type: String },
+        sessionDate: { type: Date, default: null }
     },
     proxySession: String
 });
@@ -183,6 +189,7 @@ const AccountsSchemaMongoose = new Schema<AccountsSchema>({
     deposits: { type: [AccountDepositsSchema], default: [] },
     withdraws: { type: [AccountsWithdrawsSchema], default: [] },
     lastCheckin: { type: Date, default: null },
+    checkinDay: { type: Number, default: 0 },
     states: { type: AccountStateSchema, default: {logs: [], retries: {login: 0, bind: 0}} }
 }, { timestamps: true });
 
