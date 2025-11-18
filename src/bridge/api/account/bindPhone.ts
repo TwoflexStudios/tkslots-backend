@@ -99,16 +99,11 @@ const BindPhone = async (_account: AccountsSchema | string, options: BindPhoneOp
                     "serverInfo.RegGold": rewardBonus
                 })
             }
-            await AccountsModel.updateOne(
-                { _id: (account as any)._id },
-                {
-                    $set: {
-                        balance: currentBalance,
-                        "login.phoneNumber": options.phoneNumber,
-                        "login.password": password,
-                    }
-                }
-            )
+            account.balance = Number(currentBalance);
+            account.login.phoneNumber = options.phoneNumber;
+            account.login.password = password;
+            //@ts-ignore
+            await account.save();
 
             return {
                 status: true,

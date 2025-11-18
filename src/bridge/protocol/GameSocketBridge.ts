@@ -11,7 +11,7 @@ interface SocketBridgeOptions {
     heartBeat?: boolean;
     proxyAgent?: any;
     channel?: ChannelEnum;
-    disabledTimeout?: boolean;
+    disableTimeout?: boolean;
 }
 
 const channels = {
@@ -45,7 +45,7 @@ class GameSocketBridge extends GameSocketEventEmitter {
         heartBeat: true,
         proxyAgent: null,
         channel: ChannelEnum.LOBBY,
-        disabledTimeout: false
+        disableTimeout: false
     }) {
         super();
         this.url = url;
@@ -109,7 +109,7 @@ class GameSocketBridge extends GameSocketEventEmitter {
     ) {
         const actionData = Client2ServerCommands[action];
 
-        packet.channelid = ChannelEnum.LOBBY; //packet.channelid !== undefined ? packet.channelid : this.channel;
+        packet.channelid = packet.channelid !== undefined ? packet.channelid : this.options.channel as any;
         
         packet.header = {
             bHandleCode: 0,
@@ -146,6 +146,7 @@ class GameSocketBridge extends GameSocketEventEmitter {
     async requestAsync<R = any, P = any>(
         action: keyof typeof Client2ServerCommands,
         packet: Packet<P>,
+        timeout = 10000
     ): Promise<GameSocketResponse<R> | "TIMEOUT"> {
         return new Promise(resolve => {
             this.request(action, packet, (res) => {
@@ -154,7 +155,7 @@ class GameSocketBridge extends GameSocketEventEmitter {
 
             setTimeout(() => {
                 resolve("TIMEOUT")
-            }, 10000);
+            }, timeout);
         })
     }
 
@@ -339,7 +340,7 @@ class GameSocketBridge extends GameSocketEventEmitter {
     }
 
     private resetReceiveMsgTimer(time = this.timeoutTime) {
-        if (this.options.disabledTimeout) return;
+        if (this.options.disableTimeout) return;
         if (this._receiveMsgTimer) clearTimeout(this._receiveMsgTimer);
         this._receiveMsgTimer = setTimeout(() => {
             //Se não receber mensagem em 2 minutos, fecha o socket

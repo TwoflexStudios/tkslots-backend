@@ -1,5 +1,5 @@
 import logger from "../../../config/pino";
-import AccountsModel, { AccountStateEnum } from "../../../schemas/accounts";
+import AccountsModel, { AccountStatusEnum } from "../../../schemas/accounts";
 import sitesModel from "../../../schemas/sites";
 import BowerModule from "../../../services/code/Bower";
 import { CodeEventsEnum } from "../../../globals/enums/CodeEventsEnum";
@@ -15,27 +15,35 @@ interface JobData {
     accountId: string;
 }
 
+const fetchAccount = async (accountId: string) => {
+    return await AccountsModel.findOne({ _id: accountId });
+}
+
 const BindPhoneNumberJob = async (job: Job<JobData>) => {
     await job.updateProgress("Preparando");
     const { accountId } = job.data;
-    const account = await AccountsModel.findOne({ _id: accountId });
+    let account: any = null;
+
+    account = await fetchAccount(accountId);
+
     if (!account) throw new Error("Conta não encontrada");
 
     logger.info(`[BIND QUEUE]: Bindando telefone para conta ${account._id}`);
-    account.state = AccountStateEnum.BINDING;
+    account.status = AccountStatusEnum.BUSY;
+    account.statusReason = "Vinculando telefone";
     await account.save();
 
     const siteInfo = await sitesModel.findOne({ _id: account.siteId });
 
-    if (account.states.retries.bind >= 3 || job.attemptsMade >= 3) {
-        await account.updateOne({ state: AccountStateEnum.BIND_FAILED, stateReason: "Muitas tentativas de vincular telefone" });
+    if (account.states.retries.bind >= 5 || job.attemptsMade >= 5) {
+        await account.updateOne({ status: AccountStatusEnum.BIND_FAILED, statusReason: "Muitas tentativas de vincular telefone" });
         throw new Error("Muitas tentativas de vincular telefone");
     }
 
     await job.updateProgress("Verificando conta");
 
     if (account.login.phoneNumber) {
-        account.state = AccountStateEnum.READY;
+        account.status = AccountStatusEnum.IDLE;
         account.states.logs.push({
             type: "bind",
             message: `Conta ${account._id} já possui número vinculado`,
@@ -100,16 +108,23 @@ const BindPhoneNumberJob = async (job: Job<JobData>) => {
                 logger.info(`[BIND QUEUE]: Código recebido: ${code}`)
 
                 if (bind.status) {
-                    account.state = AccountStateEnum.READY;
+                    account = await fetchAccount(accountId);
+                    account.status = AccountStatusEnum.IDLE;
                     account.states.logs.push({
                         type: "bind",
                         message: `Número vinculado: ${phoneNumber}, código: ${code}`,
                         date: new Date()
                     })
+                    smsModule.finishActivation(number.data.activationId);
                     await job.updateProgress("Finalizando");
+                    await job.updateData({
+                        ...job.data,
+                        phoneNumber
+                    } as any)
                     await account.save();
                     resolve(bind);
                 } else {
+                    account = await fetchAccount(accountId);
                     account.states.retries.bind += 1;
                     account.states.logs.push({
                         type: "bind",
@@ -124,6 +139,7 @@ const BindPhoneNumberJob = async (job: Job<JobData>) => {
 
             //On code timeout
             smsModule.on(CodeEventsEnum.CODE_TIMEOUT, async () => {
+                account = await fetchAccount(accountId);
                 account.states.logs.push({
                     type: "bind",
                     message: `Código não recebido: ${phoneNumber} cancelado`,
@@ -150,7 +166,8 @@ const BindPhoneNumberJob = async (job: Job<JobData>) => {
         const bind = await BindPhone(account, { phoneNumber: phoneNumber });
 
         if (bind.status) {
-            account.state = AccountStateEnum.READY;
+            account = await fetchAccount(accountId);
+            account.status = AccountStatusEnum.IDLE;
             account.states.logs.push({
                 type: "bind",
                 message: `Número vinculado: ${phoneNumber}`,
@@ -158,8 +175,13 @@ const BindPhoneNumberJob = async (job: Job<JobData>) => {
             })
             await account.save();
             await job.updateProgress("Finalizando");
+            await job.updateData({
+                ...job.data,
+                phoneNumber
+            } as any)
             return bind;
         } else {
+            account = await fetchAccount(accountId);
             account.states.retries.bind += 1;
             account.states.logs.push({
                 type: "bind",

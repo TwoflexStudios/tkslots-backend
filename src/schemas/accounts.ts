@@ -7,27 +7,16 @@ export enum PlatformEnum {
     NATIVE = 2
 }
 
-export enum AccountStateEnum {
-    //States padrões Pending (Criada) > Binding (Bindando) > Ready (Pronto)
-    BINDING = "binding", // Bindando telefone
-    PENDING = "pending", // Criada (Fila de bind vai puxar depois)
-    READY = "ready", // Pronto pra ser puxada por qualquer fila
-    BANNED = "banned", // Baniu
-
-    //Errors das filas
-    BIND_FAILED = "bind_failed",
-
-    //States das filas
-    CHECKING_IN = "checking_in"
-}
-
 export enum AccountStatusEnum {
-    IDLE = "idle", // Criada
+    PENDING = "pending", // Criada
+    BUSY = "busy", // Ocupada
+    IDLE = "idle", // Parada
     READY = "ready", // Pronta para ser coletada por um agente
     DONE = "done", // Concluida
     IN_PROGRESS = "in_progress", // Com um agente
     BANNED = "banned", // Baniu
-    FAILED = "failed" // Zerou o saldo
+    FAILED = "failed", // Zerou o saldo
+    BIND_FAILED = "bind_failed" // Falha ao vincular telefone
 }
 
 export enum DepositStatusEnum {
@@ -38,6 +27,7 @@ export enum DepositStatusEnum {
 
 export enum WithdrawStatusEnum {
     FAILED = 6,
+    PENDING = 1,
     SUCCESS = 5
 }
 
@@ -105,8 +95,7 @@ export interface AccountsSchema {
     source?: string;
     status: AccountStatusEnum;
     needPhone?: boolean;
-    stateReason?: string;
-    state: AccountStateEnum;
+    statusReason?: string;
     balance: number;
     login: AccountLoginInfo;
     deposits: AccountDeposits[];
@@ -181,9 +170,8 @@ const AccountsSchemaMongoose = new Schema<AccountsSchema>({
     vipLevel: { type: Number, default: 0 },
     needPhone: { type: Boolean, default: false },
     source: { type: String, default: null },
-    status: { type: String, enum: AccountStatusEnum, default: AccountStatusEnum.IDLE },
-    state: { type: String, enum: AccountStateEnum, default: AccountStateEnum.PENDING },
-    stateReason: { type: String, default: "" },
+    status: { type: String, enum: AccountStatusEnum, default: AccountStatusEnum.PENDING },
+    statusReason: { type: String, default: "" },
     balance: { type: Number, default: 0 },
     login: { type: AccountLoginInfoSchema, required: true },
     deposits: { type: [AccountDepositsSchema], default: [] },

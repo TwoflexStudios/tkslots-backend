@@ -129,6 +129,10 @@ class SMSActivateModule {
         })
     }
 
+    async finishActivation(activationId: string) {
+        await this.setStatus(activationId, 6);
+    }
+
     async cancelPhoneNumber(activationId: string) {
         await this.setStatus(activationId, 8);
     }

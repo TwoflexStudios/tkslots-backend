@@ -7,6 +7,6 @@ import DevelopFunction from "./teste";
 
 const app = new App();
 
-DevelopFunction();
+// DevelopFunction();
 
 app.listen(config.get("port"))

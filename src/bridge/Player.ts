@@ -1,6 +1,6 @@
 import logger from "../config/pino";
 import { getProxyAgent } from "../helpers/proxy";
-import AccountsModel, { AccountsSchema, AccountStateEnum, AccountStatusEnum } from "../schemas/accounts";
+import AccountsModel, { AccountsSchema, AccountStatusEnum } from "../schemas/accounts";
 import sitesModel, { SitesSchema } from "../schemas/sites";
 import { ChannelEnum, GameSocketResponse } from "../types/GameNetNode";
 import { csMailGetprop, scMailGetprop } from "../types/protobuff/pb_lobby_mail";
@@ -9,6 +9,7 @@ import { scSigninResultEx } from "../types/protobuff/pb_lobby_signin";
 import { csBankCardBindMsg, csBankCardWithdrawMsg, csBankWithdrawHistory, scBankCardInfoMsg, scBankCardWithdrawMsg, scBankWithdrawHistory } from "../types/protobuff/pb_lobby_withdraw";
 import { csUserLoginHall, csUserSessionLogin, scUserLoginHall } from "../types/protobuff/pb_user";
 import ApiLogin from "./api/account/login";
+import GameDesk from "./GameDesk";
 import GameProtocolHelper from "./protocol/GameProtocolHelper";
 import GameSocketBridge from "./protocol/GameSocketBridge";
 import GameSocketEventEmitter from "./protocol/GameSocketEventEmitter";
@@ -50,7 +51,7 @@ class Player {
         this.accountId = accountId;
     }
 
-    private log(value: string, type: "info" | "warn" | "error" | "debug" | "success" = "info") {
+    public log(value: string, type: "info" | "warn" | "error" | "debug" | "success" = "info") {
         logger[type](`[${this.accountId}:${ChannelEnum[this.location]}]: ${value}`)
     }
 
@@ -58,6 +59,7 @@ class Player {
         return new Promise(async (resolve) => {
             this.log(`Iniciando conexão`, "info");
             await this.protocolHelper.loadFromFolder("./src/protobuff/");
+            await this.protocolHelper.loadFromFolder("./src/protobuff/games");
             this.account = await AccountsModel.findOne({ _id: this.accountId }) as any;
 
             if (!this.account) {
@@ -161,7 +163,6 @@ class Player {
                     this.log(`Logando com a conta`, "info");
                     if(!data.session){
                         this.account.status = AccountStatusEnum.BANNED;
-                        this.account.state = AccountStateEnum.BANNED;
                         this.account.states.logs.push({
                             type: "error",
                             message: `Falha ao logar com a conta, conta banida`,
@@ -218,7 +219,13 @@ class Player {
 
     //Fazer checkin diário
     async dailyCheckin(){
-        await this.socket.requestAsync<scSigninResultEx, any>("c2s_signin_signin", {})
+        const res = await this.socket.requestAsync<scMailGetprop, any>("c2s_signin_signin", {})
+        if(res === "TIMEOUT"){
+            await this.save();
+            return;
+        }
+        this.account.lastCheckin = new Date();
+        await this.save();
     }
 
     //Salvar conta
@@ -349,7 +356,7 @@ class Player {
         }));
 
         this.account.uid = Number(session.uid);
-        this.account.username = session.name;
+        this.account.username = this.account.login.socket.account;
 
         await this.bindPixAccount({
             pixKey: "fafwafwfw@gmail.com",

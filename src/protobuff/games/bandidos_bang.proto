@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+package pb_game_100042;
+
+// Códigos de comando
+enum cmd_code {
+  CMD_CODE_UNKNOWN  = 0;
+  MDM_GAME_NOTIFY   = 180;  // 0xB4
+  ASS_GAME_ROLL     = 80;   // 0x50
+}
+
+// Códigos de erro
+enum error_code {
+  ERROR_CODE_UNKNOWN       = 0;
+  ROLL_BET_INVALIDE        = 1;
+  ROLL_SCORE_NOT_ENOUGH    = 2;
+  ROLL_MODE_IS_ERROR       = 3;
+  ROLL_TYPE_ERROR          = 4;
+}
+
+// Informações gerais do jogo
+message sc_game_info {
+  int32           game_station      = 1;
+  int32           line_count        = 2;
+  int64           default_bet       = 3;
+  int64           player_score      = 4;
+  sc_game_roll    game_info         = 5;
+}
+
+// Requisição do cliente para “rodar” o jogo
+message cs_game_roll {
+  int64           bet_score         = 1;
+  int32           type              = 2;
+}
+
+// Resposta do servidor ao “roll”
+message sc_game_roll {
+  int32           current_mode           = 1;
+  int32           next_mode              = 2;
+  int64           win_score              = 3;
+  int32           win_type               = 4;
+  int32           free_count             = 5;
+  int32           all_free_times         = 6;
+  int64           total_free_win_score   = 7;
+  int64           user_score             = 8;
+  int64           bet_score              = 9;
+  repeated int32  result_cells           = 11;
+  int64           multiples              = 12;
+  int64           base_score             = 13;
+  int32           type                   = 14;
+}

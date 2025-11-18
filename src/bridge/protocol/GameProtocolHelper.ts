@@ -2,6 +2,7 @@ import protobuf from 'protobufjs'
 import { GameSocketResponse, Header, Packet } from '../../types/GameNetNode';
 import { Client2ServerCommands, GetServerCommandByMainIdAndAssistantId } from '../../helpers/commands';
 import fs from "fs";
+import path from 'path';
 
 class GameProtocolHelper {
     public protobuff: protobuf.Root = new protobuf.Root();
@@ -20,17 +21,29 @@ class GameProtocolHelper {
     /**
      * Carregar arquivos de protobuff
      */
-    async loadFromFolder(folder: string){
-        try{
-            const protobaseFiles = await fs.readdirSync(folder, "utf-8");
+    async loadFromFolder(folder: string) {
+        try {
+            const items = fs.readdirSync(folder);
 
-            const path: string[] = [];
+            const files: string[] = [];
 
-            protobaseFiles.map(item => path.push(folder + item))
+            for (const item of items) {
+                const fullPath = path.join(folder, item);
+                const stats = fs.statSync(fullPath);
 
-            await this.protobuff.loadSync(path);
-        }catch(ex){
-            console.error(ex)
+                if (stats.isDirectory()) {
+                    await this.loadFromFolder(fullPath); // recursivo
+                } else {
+                    files.push(fullPath);
+                }
+            }
+
+            if (files.length > 0) {
+                await this.protobuff.loadSync(files);
+            }
+
+        } catch (ex) {
+            console.error(ex);
         }
     }
 

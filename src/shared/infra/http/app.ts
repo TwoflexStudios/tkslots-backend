@@ -3,7 +3,7 @@ import cors from "cors";
 import routes from "./routes/base";
 import { BullMonitorExpress } from "tk-monitor/src/express";
 import { BullMQAdapter } from "tk-monitor/src/root/bullmq-adapter";
-import { BindQueue, CheckinQueue } from "../../../bull/queues";
+import { BindCronQueue, BindQueue, CheckinCronQueue, CheckinQueue } from "../../../bull/queues";
 
 class App {
     private app: express.Application;
@@ -26,6 +26,8 @@ class App {
 
         const monitor = new (BullMonitorExpress as any)({
             queues: [
+                new BullMQAdapter(BindCronQueue as any),
+                new BullMQAdapter(CheckinCronQueue as any),
                 new BullMQAdapter(BindQueue as any),
                 new BullMQAdapter(CheckinQueue as any),
             ],

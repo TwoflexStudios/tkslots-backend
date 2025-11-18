@@ -1,5 +1,5 @@
 import { type Request, type Response } from "express";
-import AccountsModel, { AccountLoginTypeEnum, AccountStateEnum, AccountStatusEnum, PlatformEnum } from "../../schemas/accounts";
+import AccountsModel, { AccountLoginTypeEnum, AccountStatusEnum, PlatformEnum } from "../../schemas/accounts";
 import { SendResponse } from "../../helpers/res";
 import { CreateAccount } from "../../bridge/api/account";
 import { getRandomDeviceId } from "../../bridge/api/server";
@@ -7,7 +7,6 @@ import { getRandomDeviceId } from "../../bridge/api/server";
 interface ListAccountsFilters {
     siteId?: string;
     status?: AccountStatusEnum[];
-    state?: AccountStateEnum[];
     page?: string;
     limit?: string;
 }
@@ -16,7 +15,7 @@ class AccountsController {
     static listAccounts() {
         return async (req: Request, res: Response) => {
             try {
-                const { siteId, status, state, page = "1", limit = "20" } = req.query as ListAccountsFilters;
+                const { siteId, status, page = "1", limit = "20" } = req.query as ListAccountsFilters;
 
                 const numericPage = Math.max(parseInt(page), 1);
                 const numericLimit = Math.max(parseInt(limit), 1);
@@ -25,7 +24,6 @@ class AccountsController {
 
                 if (siteId) filters.siteId = siteId;
                 filters.status = { $in: status || [AccountStatusEnum.READY] };
-                filters.state = { $in: state || [AccountStatusEnum.DONE] };
 
                 const skip = (numericPage - 1) * numericLimit;
 

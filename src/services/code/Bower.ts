@@ -166,6 +166,10 @@ class BowerModule {
         await this.setStatus(activationId, 8);
     }
 
+    async finishActivation(activationId: string) {
+        await this.setStatus(activationId, 6);
+    }
+
     async createListener(activationId: string) {
         const timeout = 120000; // 2 minutos
         const halfTime = 60000; // 1 minuto
