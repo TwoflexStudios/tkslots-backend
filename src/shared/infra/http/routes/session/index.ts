@@ -38,6 +38,7 @@ SessionRoutes.post("/", async (req, res) => {
     return res.status(201).json(
         {
             status: true, token, user: {
+                _id: userInfo._id.toString(),
                 name: userInfo.name,
                 username: userInfo.username,
                 permissions: userInfo.permissions,

@@ -3,10 +3,19 @@ import App from "./shared/infra/http/app"
 import config from "./config/convict";
 import './config/connection';
 import "./bull/workers"
-import DevelopFunction from "./teste";
+import http from 'http';
+import { Server } from 'socket.io';
 
-const app = new App();
+const app = App.getInstance();
 
-// DevelopFunction();
+const server = http.createServer(app.app);
 
-app.listen(config.get("port"))
+const io = new Server(server, {
+  cors: { origin: "*" }
+});
+
+app.initSocket(io);
+
+server.listen(config.get("port"), () => {
+  console.log(`App Running at port ${config.get("port")}`);
+});

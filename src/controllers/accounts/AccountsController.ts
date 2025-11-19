@@ -1,9 +1,10 @@
-import { type Request, type Response } from "express";
+import { application, type Request, type Response } from "express";
 import AccountsModel, { AccountLoginTypeEnum, AccountStatusEnum, PlatformEnum } from "../../schemas/accounts";
 import { SendResponse } from "../../helpers/res";
 import { CreateAccount } from "../../bridge/api/account";
 import { getRandomDeviceId } from "../../bridge/api/server";
 import mongoose from "mongoose";
+import { useApplication } from "../../shared/infra/http/app";
 
 interface ListAccountsFilters {
     siteId?: string;
@@ -26,6 +27,10 @@ class AccountsController {
                 filters.status = { $in: status || [AccountStatusEnum.READY] };
 
                 const skip = (numericPage - 1) * numericLimit;
+
+                filters.userId = {
+                    $in: [req.userAuthenticated.id, null]
+                }
 
                 const [data, total] = await Promise.all([
                     AccountsModel.find(filters)
@@ -77,8 +82,7 @@ class AccountsController {
         return async (req: Request, res: Response) => {
             const {accountId} = req.params;
             const {status} = req.body;
-
-            const accountData = await AccountsModel.findOne({_id: accountId});
+            const accountData = await AccountsModel.findOne({_id: accountId}).populate("siteId");
 
             if(!accountData){
                 return SendResponse(res, {
@@ -94,7 +98,11 @@ class AccountsController {
                 })
             }
 
-            if(status === AccountStatusEnum.IN_PROGRESS){
+            if(status === AccountStatusEnum.READY){
+                accountData.userId = null;
+            }
+
+            if(status === AccountStatusEnum.IN_PROGRESS || status === AccountStatusEnum.DONE || status === AccountStatusEnum.FAILED){
                 if(accountData.userId && accountData.userId.toString() !== req.userAuthenticated.id){
                     return SendResponse(res, {
                         status: false,
@@ -109,6 +117,28 @@ class AccountsController {
             }
 
             accountData.status = status;
+
+            const getMessage = () => {
+                if(status === AccountStatusEnum.IN_PROGRESS){
+                    return `⏳ ${req.userAuthenticated.name} iniciou: ${(accountData.siteId as any).gameTitle} ${accountData.username}`
+                }
+                if(status === AccountStatusEnum.DONE){
+                    return `✅ ${req.userAuthenticated.name} finalizou: ${(accountData.siteId as any).gameTitle} ${accountData.username}`
+                }
+                if(status === AccountStatusEnum.FAILED){
+                    return `❌ ${req.userAuthenticated.name} falhou: ${(accountData.siteId as any).gameTitle} ${accountData.username}`
+                }
+                if(status === AccountStatusEnum.READY){
+                    return `🔙 ${req.userAuthenticated.name} dropou a conta: ${(accountData.siteId as any).gameTitle} ${accountData.username}`
+                }
+            }
+
+            useApplication().socket.desk.emit("account_updated", {
+                accountId: accountData._id,
+                userId: req.userAuthenticated.id,
+                status,
+                message: getMessage()
+            });
 
             await accountData.save();
 
