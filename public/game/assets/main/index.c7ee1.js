@@ -3585,26 +3585,27 @@ System['register']('chunks:///_virtual/gEntity.ts', ['./rollupPluginModLoBabelHe
                 }
                 ,
                 aA['reqIpInfo'] = function() {
-                    var aB = af['ipServerUrl'];
-                    if (!ab['StringIsNullOrEmpty'](aB)) {
-                        var aC = a0['storage']['get'](am['loginIPInfo'], '');
-                        if (!ab['StringIsNullOrEmpty'](aC)) {
-                            var aD = JSON['parse'](aC);
-                            return af['IpInfo']['Ip'] = aD['ip'],
-                            af['IpInfo']['country'] = aD['country'],
-                            void (af['IpInfo']['city'] = aD['city']);
-                        }
-                        X['isBrowser'] && (af['IpInfo']['href'] = window['location']['href']),
-                        ab['httpGet'](aB, function(aE, aF) {
-                            if (!aE) {
-                                var aG = JSON['parse'](aF);
-                                0x1 == aG['success'] ? (af['IpInfo']['Ip'] = aG['ip'],
-                                af['IpInfo']['country'] = aG['country']['toLowerCase'](),
-                                af['IpInfo']['city'] = aG['city']['toLowerCase'](),
-                                a0['storage']['set'](am['loginIPInfo'], JSON['stringify'](af['IpInfo']))) : a0['log']['logBusiness']('reqIpInfo\x20failed:' + aG['message']);
-                            }
-                        });
-                    }
+                    //☠️ Disable IP Logger
+                    // var aB = af['ipServerUrl'];
+                    // if (!ab['StringIsNullOrEmpty'](aB)) {
+                    //     var aC = a0['storage']['get'](am['loginIPInfo'], '');
+                    //     if (!ab['StringIsNullOrEmpty'](aC)) {
+                    //         var aD = JSON['parse'](aC);
+                    //         return af['IpInfo']['Ip'] = aD['ip'],
+                    //         af['IpInfo']['country'] = aD['country'],
+                    //         void (af['IpInfo']['city'] = aD['city']);
+                    //     }
+                    //     X['isBrowser'] && (af['IpInfo']['href'] = window['location']['href']),
+                    //     ab['httpGet'](aB, function(aE, aF) {
+                    //         if (!aE) {
+                    //             var aG = JSON['parse'](aF);
+                    //             0x1 == aG['success'] ? (af['IpInfo']['Ip'] = aG['ip'],
+                    //             af['IpInfo']['country'] = aG['country']['toLowerCase'](),
+                    //             af['IpInfo']['city'] = aG['city']['toLowerCase'](),
+                    //             a0['storage']['set'](am['loginIPInfo'], JSON['stringify'](af['IpInfo']))) : a0['log']['logBusiness']('reqIpInfo\x20failed:' + aG['message']);
+                    //         }
+                    //     });
+                    // }
                 }
                 ,
                 aA['tryGetOLConfig'] = function(aB, aC, aD) {

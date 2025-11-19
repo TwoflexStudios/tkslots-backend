@@ -50,4 +50,17 @@ function closeBypassModal() {
     window.cc?.director?.resume();
 }
 
-window.closeBypassModal = closeBypassModal;
+window.bypassCompleted = () => {
+    try{
+        const accountId = window.GAME_DATA.account._id;
+        window.parent.postMessage({ type: "bypass-completed", data: {accountId: accountId} }, "*");
+
+        const modal = document.getElementById('bypassModal');
+        modal.style.display = 'none';
+        clearInterval(countdownInterval);
+        window.breakingBonus = false;
+        window.cc?.director?.resume();
+    }catch{
+        
+    }
+}

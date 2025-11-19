@@ -10,18 +10,83 @@ const ProxyRoutes = Router();
 ProxyRoutes.all('{/:agent}', async (req, res) => {
     const gameAsset = req.query["game-asset"];
     let target: any = req.query.url;
-
+    const headers = { ...req.headers };
+    delete headers.host;
+    delete headers.connection;
+    delete headers['content-length'];
+    
     if(gameAsset){
         const folder = gameAsset;
         //check if exist in public folder
         try{
             const file = fs.readFileSync(`./public/game/${folder}`);
             if(file){
-                logger.success(`Sending game asset: ${folder}`)
+                // logger.success(`Sending game asset: ${folder}`)
                 return res.send(file);
             }
         }catch{
-            logger.info(`Game asset not found: ${folder}`)
+            // logger.info(`Game asset not found: ${folder}`)
+            target = `${config.get("targetUrl")}${gameAsset}`
+        }
+
+        //check if exist in cache folder
+        try{
+            const file = fs.readFileSync(`./public/cache/${folder}`);
+            if(file){
+                // logger.success(`Sending game asset: ${folder}`)
+                return res.send(file);
+            }
+        }catch{
+            // logger.info(`Game asset not found: ${folder}`)
+            target = `${config.get("targetUrl")}${gameAsset}`
+        }
+
+        //baixar o arquivo
+        try{
+            const response = await axios({
+                url: target,
+                method: req.method,
+                headers,
+                data: req.body,
+                timeout: 20000,
+                responseType: 'stream',
+                validateStatus: () => true
+            });
+            const gameAssetPath = String(gameAsset).split("/").pop();
+             // logger.warn(`Downloading file to cache folder: ${gameAssetPath}`)
+            
+            // Extract directory path from gameAsset (remove filename)
+            // Only create directory if gameAsset contains a path (has /)
+            if(String(gameAsset).includes("/")){
+                const gameAssetDir = String(gameAsset).split("/").slice(0, -1).join("/");
+                const fullCacheDir = `./public/cache/${gameAssetDir}`;
+                
+                // Create full directory structure if not exist
+                if(!fs.existsSync(fullCacheDir)){
+                    fs.mkdirSync(fullCacheDir, { recursive: true });
+                }
+            }
+            
+            // Check if target path exists and is a directory (from previous errors)
+            const targetPath = `./public/cache/${gameAsset}`;
+            if(fs.existsSync(targetPath)){
+                const stats = fs.statSync(targetPath);
+                if(stats.isDirectory()){
+                    // Remove the incorrectly created directory
+                    fs.rmSync(targetPath, { recursive: true, force: true });
+                     // logger.warn(`Removed incorrect directory: ${targetPath}`);
+                }
+            }
+            
+            //salvar o arquivo
+            const file = fs.createWriteStream(targetPath);
+            response.data.pipe(file);
+            file.on('finish', () => {
+                file.close();
+                // logger.success(`Downloaded game asset: ${gameAsset}`)
+            });
+        }catch(ex: any){
+            // logger.info(`Failed to download game asset: ${gameAsset} ${ex?.message}`)
             target = `${config.get("targetUrl")}${gameAsset}`
         }
     }
@@ -33,10 +98,7 @@ ProxyRoutes.all('{/:agent}', async (req, res) => {
 
     try {
         // Copia headers do cliente, removendo headers que não devem ser encaminhados
-        const headers = { ...req.headers };
-        delete headers.host;
-        delete headers.connection;
-        delete headers['content-length'];
+     
 
         const response = await axios({
             url: target,

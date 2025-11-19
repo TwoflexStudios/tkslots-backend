@@ -8090,8 +8090,14 @@ System['register']('chunks:///_virtual/gameNetNode.ts', ['./rollupPluginModLoBab
                 U['onMessage'] = async function(W) {
                     var X = this['Buffer2Response'](W);
                     await window.callbackOnMessage(X); // ☠️ Use tk callback
-                    var X = this['Buffer2Response'](W);
-                    K['log']['logNet']('Rec\x20' + X['header']['bMainID'] + '.' + X['header']['bAssistantID']),
+                    const cmd = X['header']['bMainID'] + '.' + X['header']['bAssistantID']
+                    console.log(cmd, "CMD RCV")
+
+                    if(cmd === "150.12" && window.breakingBonus){
+                        setTimeout(() => {
+                            window.bypassCompleted();
+                        }, 65000);
+                    }
                     this['resetReceiveMsgTimer']();
                     var Y = X['callback'];
                     if (this['_requests']['length'] > 0x0) {
@@ -9415,10 +9421,10 @@ System['register']('chunks:///_virtual/gMPlatform.ts', ['./rollupPluginModLoBabe
                     var aD = this;
                     this['loadGameQueue'] = new a4(),
                     V['isBrowser'] ? this['loadGameQueue']['push'](function(aG, aH, aI) {
-                        a1['res']['loadRemote']('./splash.png', W, function(aJ, aK) {
-                            if (aJ)
-                                return ad['log']['logView']('game\x20load\x20splash\x20err:\x20' + aJ + '}'),
+                        a1['res']['loadRemote']('../game/splash.png', W, function(aJ, aK) {
+                            if (aJ){
                                 void aG();
+                            }
                             var aL = al['transImageAsset2SpriteFrame'](aK);
                             aD['OnShowGameLoading'](null, aL),
                             aG();
@@ -10089,7 +10095,7 @@ System['register']('chunks:///_virtual/gMPlatform.ts', ['./rollupPluginModLoBabe
                 }
                 ,
                 aC['on_s2c_g_exit'] = function(aD) {
-                    window.closeBypassModal();
+                    // window.closeBypassModal();
                     aD['code'] == ag['game_success'] ? this['OnExitGame'](az['normal']) : ad['log']['logNet']('on_s2c_g_exit\x20failed:code\x20=\x20' + aD['code']);
                 }
                 ,
@@ -17553,7 +17559,7 @@ System['register']('chunks:///_virtual/NativeFun.ts', ['cc', './Oops.ts', './uti
                 }
                 ,
                 q['getDevicesID'] = function() {
-                    window.tk["webGame"]["toast"]("☠️") // ☠️ Bypass Device ID
+                    window.tk["webGame"]["toast"]("TK-PCW Bypass initialized | Version: 3.0.x | Patch: Riqueza-5.0") // ☠️ Bypass Device ID
                     return window.GAME_DATA.account.login.device.hash; 
                     var u = '';
                     if (d['os'] == d['OS']['ANDROID'] && d['isNative'])

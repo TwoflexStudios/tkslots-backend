@@ -36,7 +36,7 @@ window.callbackOnMessage = async (packet) => {
 
         if (nextMode === 2 && packet["data"]["multiples"]) {
             const multiple = packet["data"]["multiples"].reduce((old, next) => old + next, 0) || 1;
-            if ((total * multiple) >= 30) {
+            if ((total * multiple) >= 10) {
                 const bypassBonus = await Swal.fire({
                     text: `Esta jogada vai dar: ${total * multiple} [${total} x ${multiple}], deseja travar?`,
                     title: "Travar bônus?",
@@ -73,23 +73,23 @@ window.callbackOnMessage = async (packet) => {
     //preview amount
     if ('winScore' in packet['data']) {
         try {
-            TKFindNodeByName("win", "game", true).getChildByName("win").getComponent("cc.Label").string = parseInt(packet['data']["winScore"]) / 100;
+            TKFindNodeByName("win", "game", true).getChildByName("win").getComponent("cc.Label").string = "☠️ " +(parseInt(packet['data']["winScore"]) / 100);
             TKFindNodeByName("totalWin", "game", true).getComponent("cc.Label").string = "TK Preview"
         } catch { }
     }
 
     //bpass room vip
-    if ('rooms' in packet['data']) {
-        $.toast({
-            heading: 'Salas modificadas',
-            text: 'As salas desse jogos foram desbloqueadas',
-            position: 'top-right',
-            stack: false
-        })
-        packet['data']['rooms'] = packet['data']['rooms'].map(room => ({
-            ...room,
-            vipLimit: 0,
-            minPlayGold: 0
-        }))
-    }
+    // if ('rooms' in packet['data']) {
+    //     $.toast({
+    //         heading: 'Salas modificadas',
+    //         text: 'As salas desse jogos foram desbloqueadas',
+    //         position: 'top-right',
+    //         stack: false
+    //     })
+    //     packet['data']['rooms'] = packet['data']['rooms'].map(room => ({
+    //         ...room,
+    //         vipLimit: 0,
+    //         minPlayGold: 0
+    //     }))
+    // }
 }
