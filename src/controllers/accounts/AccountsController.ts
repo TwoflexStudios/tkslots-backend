@@ -150,6 +150,26 @@ class AccountsController {
         }
     }
 
+    static saveAnnotations(){
+        return async (req: Request, res: Response) => {
+            const {accountId} = req.params;
+            const {annotations} = req.body;
+            const accountData = await AccountsModel.findOne({_id: accountId});
+            if(!accountData){
+                return SendResponse(res, {
+                    status: false,
+                    message: "Conta não encontrada"
+                })
+            }
+            accountData.annotations = annotations || accountData.annotations || [];
+            await accountData.save();
+            return SendResponse(res, {
+                status: true,
+                message: "Anotações salvas com sucesso"
+            })
+        }
+    }
+
     static getAccountById() {
         return async (req: Request, res: Response) => {
             const {accountId} = req.params;

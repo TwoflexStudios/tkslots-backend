@@ -95,6 +95,10 @@ export interface AccountsSchema {
     vipLevel: number;
     source?: string;
     status: AccountStatusEnum;
+    annotations: {
+        title: string;
+        description: string;
+    }[]
     needPhone?: boolean;
     statusReason?: string;
     balance: number;
@@ -171,6 +175,14 @@ const AccountsSchemaMongoose = new Schema<AccountsSchema>({
     vipLevel: { type: Number, default: 0 },
     needPhone: { type: Boolean, default: false },
     source: { type: String, default: null },
+    annotations: {
+        type: [{
+            title: { type: String, default: null },
+            description: { type: String, default: null }
+        }],
+        default: [],
+        _id: false
+    },
     status: { type: String, enum: AccountStatusEnum, default: AccountStatusEnum.PENDING },
     statusReason: { type: String, default: "" },
     balance: { type: Number, default: 0 },

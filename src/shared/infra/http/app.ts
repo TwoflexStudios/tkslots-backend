@@ -9,7 +9,6 @@ import { DecodeToken, UserAuthenticated } from "../../../services/token";
 
 interface SocketList {
     desk: Namespace,
-    chat: Namespace
 }
 
 interface ConnectedUser {
@@ -25,7 +24,6 @@ class App {
 
     public socket: SocketList = {
         desk: null as any,
-        chat: null as any
     };
 
     // Construtor privado → só pode ser criado via getInstance()
@@ -44,7 +42,6 @@ class App {
 
     public initSocket(io: Server) {
         this.socket.desk = io.of("/desk");
-        this.socket.chat = io.of("/chat");
 
         this.socket.desk.on("connection", (socket) => {
             socket.on("enter", async ({token}: {token: string}) => {
@@ -53,6 +50,10 @@ class App {
                     this.connectedUsers.push({
                         user: decoded,
                         socket: socket
+                    });
+
+                    socket.on("message", ({message, username}) => {
+                        socket.broadcast.emit("message", {message, username});
                     });
 
                     socket.on("disconnect", () => {
@@ -85,12 +86,6 @@ class App {
                         }));
                     });
                 }
-            });
-        });
-
-        this.socket.chat.on("connection", (socket) => {
-            socket.on("message", ({message, username}) => {
-                socket.broadcast.emit("message", {message, username});
             });
         });
     }

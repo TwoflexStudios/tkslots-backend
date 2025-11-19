@@ -16,6 +16,12 @@ AccountsRoutes.post(
     AccountsController.setStatus()
 )
 
+AccountsRoutes.post(
+    "/:accountId/annotations", 
+    AuthController.HeaderAuth(), 
+    AccountsController.saveAnnotations()
+)
+
 AccountsRoutes.get(
     "/:accountId", 
     AuthController.QueryAuth(), 
