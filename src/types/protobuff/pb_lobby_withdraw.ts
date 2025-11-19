@@ -74,6 +74,7 @@ export interface scBankCardInfoMsg {
 export interface csBankWithdrawHistory {
   number: number;
   page: number;
+  day: number;
 }
 
 export interface scBankWithdrawHistory {
@@ -876,7 +877,7 @@ export const scBankCardInfoMsg: MessageFns<scBankCardInfoMsg> = {
 };
 
 function createBasecsBankWithdrawHistory(): csBankWithdrawHistory {
-  return { number: 0, page: 0 };
+  return { number: 0, page: 0, day: 0 };
 }
 
 export const csBankWithdrawHistory: MessageFns<csBankWithdrawHistory> = {
@@ -886,6 +887,9 @@ export const csBankWithdrawHistory: MessageFns<csBankWithdrawHistory> = {
     }
     if (message.page !== 0) {
       writer.uint32(16).int32(message.page);
+    }
+    if (message.day !== 0) {
+      writer.uint32(24).int32(message.day);
     }
     return writer;
   },
@@ -913,6 +917,14 @@ export const csBankWithdrawHistory: MessageFns<csBankWithdrawHistory> = {
           message.page = reader.int32();
           continue;
         }
+        case 3: {
+          if (tag !== 24) {
+            break;
+          }
+
+          message.day = reader.int32();
+          continue;
+        }
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -926,6 +938,7 @@ export const csBankWithdrawHistory: MessageFns<csBankWithdrawHistory> = {
     return {
       number: isSet(object.number) ? globalThis.Number(object.number) : 0,
       page: isSet(object.page) ? globalThis.Number(object.page) : 0,
+      day: isSet(object.day) ? globalThis.Number(object.day) : 0,
     };
   },
 
@@ -937,6 +950,9 @@ export const csBankWithdrawHistory: MessageFns<csBankWithdrawHistory> = {
     if (message.page !== 0) {
       obj.page = Math.round(message.page);
     }
+    if (message.day !== 0) {
+      obj.day = Math.round(message.day);
+    }
     return obj;
   },
 
@@ -947,6 +963,7 @@ export const csBankWithdrawHistory: MessageFns<csBankWithdrawHistory> = {
     const message = createBasecsBankWithdrawHistory();
     message.number = object.number ?? 0;
     message.page = object.page ?? 0;
+    message.day = object.day ?? 0;
     return message;
   },
 };

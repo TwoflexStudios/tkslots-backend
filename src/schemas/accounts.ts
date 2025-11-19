@@ -8,6 +8,7 @@ export enum PlatformEnum {
 }
 
 export enum AccountStatusEnum {
+    PLAYING = "playing", // Jogando
     PENDING = "pending", // Criada
     BUSY = "busy", // Ocupada
     IDLE = "idle", // Parada
@@ -39,7 +40,7 @@ export enum AccountLoginTypeEnum {
 export interface AccountDeposits {
     transactionId: string;
     amount: number;
-    link: string;
+    link?: string;
     gateway: string;
     gatewayId: number;
     date: Date;
@@ -50,7 +51,7 @@ export interface AccountsWithdraws {
     transactionId: string;
     amount: number;
     pix: string;
-    description: string;
+    description?: string;
     status: WithdrawStatusEnum;
     date: Date;
 }
@@ -110,22 +111,22 @@ export interface AccountsSchema {
 // Subschemas
 
 const AccountDepositsSchema = new Schema<AccountDeposits>({
-    transactionId: { type: String, required: true },
-    amount: { type: Number, required: true },
-    link: { type: String, required: true },
-    gateway: { type: String, required: true },
-    gatewayId: { type: Number, required: true },
-    date: { type: Date, required: true },
-    status: { type: Number, enum: DepositStatusEnum, required: true }
+    transactionId: { type: String },
+    amount: { type: Number },
+    link: { type: String },
+    gateway: { type: String },
+    gatewayId: { type: Number },
+    date: { type: Date },
+    status: { type: Number }
 });
 
 const AccountsWithdrawsSchema = new Schema<AccountsWithdraws>({
-    transactionId: { type: String, required: true },
-    amount: { type: Number, required: true },
-    pix: { type: String, required: true },
-    description: { type: String, required: true },
-    status: { type: Number, enum: WithdrawStatusEnum, required: true },
-    date: { type: Date, required: true }
+    transactionId: { type: String },
+    amount: { type: Number },
+    pix: { type: String },
+    description: { type: String },
+    status: { type: Number  },
+    date: { type: Date }
 });
 
 const AccountLoginInfoSchema = new Schema<AccountLoginInfo>({

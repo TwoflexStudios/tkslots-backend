@@ -59,6 +59,16 @@ const config = convict({
             doc: "",
             env: "REDIS_URL"
         }
+    },
+    thisUrl: {
+        default: "",
+        doc: "",
+        env: "THIS_URL"
+    },
+    targetUrl: {
+        default: "",
+        doc: "",
+        env: "TARGET_URL"
     }
 })
 

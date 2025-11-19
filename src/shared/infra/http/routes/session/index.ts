@@ -35,7 +35,7 @@ SessionRoutes.post("/", async (req, res) => {
         username: userInfo.username
     })
 
-    return res.status(401).json(
+    return res.status(201).json(
         {
             status: true, token, user: {
                 name: userInfo.name,

@@ -296,7 +296,8 @@ class Player {
             {
                 data: {
                     number: 500,
-                    page: 1
+                    page: 1,
+                    day: 30
                 }
             }
         )
@@ -311,7 +312,8 @@ class Player {
             {
                 data: {
                     number: 500,
-                    page: 1
+                    page: 1,
+                    day: 30
                 }
             }
         )
@@ -344,7 +346,7 @@ class Player {
             gatewayId: deposit.typeId,
             date: new Date(deposit.orderTime),
             status: deposit.state
-        }));
+        })) || [];
 
         this.account.withdraws = withdraws.map(withdraw => ({
             transactionId: withdraw.transNo,
@@ -353,7 +355,7 @@ class Player {
             description: withdraw.remark.toString(),
             status: withdraw.state,
             date: new Date(withdraw.timeStamp)
-        }));
+        })) || [];
 
         this.account.uid = Number(session.uid);
         this.account.username = this.account.login.socket.account;

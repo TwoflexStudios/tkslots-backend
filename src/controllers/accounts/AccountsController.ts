@@ -3,6 +3,7 @@ import AccountsModel, { AccountLoginTypeEnum, AccountStatusEnum, PlatformEnum } 
 import { SendResponse } from "../../helpers/res";
 import { CreateAccount } from "../../bridge/api/account";
 import { getRandomDeviceId } from "../../bridge/api/server";
+import mongoose from "mongoose";
 
 interface ListAccountsFilters {
     siteId?: string;
@@ -21,7 +22,6 @@ class AccountsController {
                 const numericLimit = Math.max(parseInt(limit), 1);
 
                 const filters: Record<string, any> = {};
-
                 if (siteId) filters.siteId = siteId;
                 filters.status = { $in: status || [AccountStatusEnum.READY] };
 
@@ -29,6 +29,7 @@ class AccountsController {
 
                 const [data, total] = await Promise.all([
                     AccountsModel.find(filters)
+                        .populate("siteId")
                         .sort({ _id: -1 })
                         .skip(skip)
                         .limit(numericLimit),
@@ -69,6 +70,70 @@ class AccountsController {
                 }
             })
             res.status(200).json({status: "Ok", account})
+        }
+    }
+
+    static setStatus(){
+        return async (req: Request, res: Response) => {
+            const {accountId} = req.params;
+            const {status} = req.body;
+
+            const accountData = await AccountsModel.findOne({_id: accountId});
+
+            if(!accountData){
+                return SendResponse(res, {
+                    status: false,
+                    message: "Conta não encontrada"
+                })
+            }
+
+            if(accountData.status === AccountStatusEnum.BUSY){
+                return SendResponse(res, {
+                    status: false,
+                    message: "A conta esta ocupada"
+                })
+            }
+
+            if(status === AccountStatusEnum.IN_PROGRESS){
+                if(accountData.userId && accountData.userId.toString() !== req.userAuthenticated.id){
+                    return SendResponse(res, {
+                        status: false,
+                        message: "A conta esta sendo usada por outro agente"
+                    })
+                }
+                accountData.userId = new mongoose.Types.ObjectId(req.userAuthenticated.id) as any;
+            }
+
+            if(status === AccountStatusEnum.FAILED){
+                //@OTOD: Validar se a conta ainda pode ser usada...
+            }
+
+            accountData.status = status;
+
+            await accountData.save();
+
+            return SendResponse(res, {
+                status: true,
+                message: "Status atualizado com sucesso"
+            })
+            
+        }
+    }
+
+    static getAccountById() {
+        return async (req: Request, res: Response) => {
+            const {accountId} = req.params;
+            const accountData = await AccountsModel.findOne({_id: accountId});
+            if(!accountData){
+                return SendResponse(res, {
+                    status: false,
+                    message: "Conta não encontrada"
+                })
+            }
+            return SendResponse(res, {
+                status: true,
+                data: accountData
+            })
         }
     }
 }

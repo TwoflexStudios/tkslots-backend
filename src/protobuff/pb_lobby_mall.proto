@@ -55,6 +55,7 @@ message sc_charge_buy_coin {
 message cs_charge_histroy {
   int32 number = 1; // número de registros por página
   int32 page = 2;   // número da página
+  int32 day = 3;
 }
 
 message sc_charge_histroy {

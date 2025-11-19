@@ -22,6 +22,9 @@ class App {
     }
 
     loadRoutes() {
+        this.app.set("query parser", "extended");
+        this.app.use(express.urlencoded({ extended: true }));
+        this.app.use(express.static("./public"))
         this.app.use("/", routes);
 
         const monitor = new (BullMonitorExpress as any)({

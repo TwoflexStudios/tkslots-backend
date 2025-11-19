@@ -10,6 +10,19 @@ AccountsRoutes.get(
     AccountsController.listAccounts()
 )
 
+AccountsRoutes.post(
+    "/:accountId/status", 
+    AuthController.HeaderAuth(), 
+    AccountsController.setStatus()
+)
+
+AccountsRoutes.get(
+    "/:accountId", 
+    AuthController.QueryAuth(), 
+    AccountsController.getAccountById()
+)
+
+
 AccountsRoutes.get(
     "/create-test-account", 
     AccountsController.createTestAccount()

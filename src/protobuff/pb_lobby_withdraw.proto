@@ -58,6 +58,7 @@ message sc_bank_card_info_msg {
 message cs_bank_withdraw_history {
   int32 number = 1;
   int32 page = 2;
+  int32 day = 3;
 }
 
 message sc_bank_withdraw_history {
