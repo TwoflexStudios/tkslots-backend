@@ -4,17 +4,24 @@ import routes from "./routes/base";
 import { BullMonitorExpress } from "tk-monitor/src/express";
 import { BullMQAdapter } from "tk-monitor/src/root/bullmq-adapter";
 import { BindCronQueue, BindQueue, CheckinCronQueue, CheckinQueue } from "../../../bull/queues";
-import { Namespace, Server } from "socket.io";
+import { Namespace, Server, Socket } from "socket.io";
+import { DecodeToken, UserAuthenticated } from "../../../services/token";
 
 interface SocketList {
     desk: Namespace,
     chat: Namespace
 }
 
+interface ConnectedUser {
+    user: UserAuthenticated,
+    socket: Socket
+}
+
 class App {
     private static instance: App | null = null;
 
     public app: express.Application;
+    private connectedUsers: ConnectedUser[] = [];
 
     public socket: SocketList = {
         desk: null as any,
@@ -38,6 +45,48 @@ class App {
     public initSocket(io: Server) {
         this.socket.desk = io.of("/desk");
         this.socket.chat = io.of("/chat");
+
+        this.socket.desk.on("connection", (socket) => {
+            socket.on("enter", async ({token}: {token: string}) => {
+                const decoded = await DecodeToken(token);
+                if(decoded){
+                    this.connectedUsers.push({
+                        user: decoded,
+                        socket: socket
+                    });
+
+                    socket.on("disconnect", () => {
+                        this.connectedUsers = this.connectedUsers.filter(user => user.socket.id !== socket.id);
+                        this.connectedUsers.forEach(user => {
+                            user.socket.emit("online_users", this.connectedUsers.map(user => {
+                                return {
+                                    id: user.user.id,
+                                    name: user.user.name,
+                                }
+                            }));
+                        });
+                    });
+
+                    socket.on("get_online_users", () => {
+                        socket.emit("online_users", this.connectedUsers.map(user => {
+                            return {
+                                id: user.user.id,
+                                name: user.user.name,
+                            }
+                        }));
+                    });
+
+                    this.connectedUsers.forEach(user => {
+                        user.socket.emit("online_users", this.connectedUsers.map(user => {
+                            return {
+                                id: user.user.id,
+                                name: user.user.name,
+                            }
+                        }));
+                    });
+                }
+            });
+        });
 
         this.socket.chat.on("connection", (socket) => {
             socket.on("message", ({message, username}) => {
