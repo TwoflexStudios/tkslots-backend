@@ -58,7 +58,7 @@ class BowerModule {
         }
 
         if (options.price.from) {
-            const { data: prices } = await this.api.get("", {
+            const { data: prices } = await this.api.get("/stubs/handler_api.php", {
                 params: {
                     action: "getPricesV3",
                     service: options.service,
@@ -153,7 +153,7 @@ class BowerModule {
     }
 
     async setStatus(activationId: string, status: number) {
-        await this.api.get("", {
+        await this.api.get("/stubs/handler_api.php", {
             params: {
                 action: "setStatus",
                 id: activationId,

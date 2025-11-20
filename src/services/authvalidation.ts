@@ -38,6 +38,34 @@ class AuthController {
     next()
   }
 
+  static ParamAuth = () => async (
+    req: Request,
+    resp: Response,
+    next: NextFunction,
+  ) => {
+    const token: string = req.params.token as string
+
+    if (!token) {
+      return SendResponse(resp, {
+        status: false,
+        message: 'Unauthorized',
+      }, 401)
+    }
+
+    const UserAuthenticated = await DecodeToken(token as string)
+
+    if (!UserAuthenticated) {
+      return SendResponse(resp, {
+        status: false,
+        message: 'Unauthorized',
+      }, 401)
+    }
+
+    req.userAuthenticated = UserAuthenticated
+
+    next()
+  }
+
   static QueryAuth = () => async (
     req: Request,
     resp: Response,

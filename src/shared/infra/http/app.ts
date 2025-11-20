@@ -7,6 +7,8 @@ import { AddBotsQueue, BindCronQueue, BindQueue, CheckinCronQueue, CheckinQueue 
 import { Namespace, Server } from "socket.io";
 import { ConnectedUser } from "../socket/types";
 import { registerSocketListeners } from "../socket/listeners";
+import AuthController from "../../../services/authvalidation";
+import { PermissionsEnum } from "../../../schemas/users";
 
 export const AUTH_USER_ROOM = "authenticated";
 
@@ -77,7 +79,7 @@ class App {
         });
 
         monitor.init().then(() => {
-            this.app.use("/tk-queue", monitor.router as any);
+            this.app.use("/tk-queue/:token", AuthController.ParamAuth(), AuthController.CheckPermission(PermissionsEnum.QUEUE), monitor.router as any);
         });
 
         this.app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {

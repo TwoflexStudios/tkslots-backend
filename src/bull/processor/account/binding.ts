@@ -28,6 +28,16 @@ const BindPhoneNumberJob = async (job: Job<JobData>) => {
 
     if (!account) throw new Error("Conta não encontrada");
 
+    if(account.login.phoneNumber){
+        return {
+            status: true,
+            message: `Conta ${account._id} já possui número vinculado`,
+            data: {
+                phoneNumber: account.login.phoneNumber
+            }
+        }
+    }
+
     logger.info(`[BIND QUEUE]: Bindando telefone para conta ${account._id}`);
     account.status = AccountStatusEnum.BUSY;
     account.statusReason = "Vinculando telefone";
@@ -115,6 +125,7 @@ const BindPhoneNumberJob = async (job: Job<JobData>) => {
                         message: `Número vinculado: ${phoneNumber}, código: ${code}`,
                         date: new Date()
                     })
+                     account.statusReason = "";
                     smsModule.finishActivation(number.data.activationId);
                     await job.updateProgress("Finalizando");
                     await job.updateData({
@@ -173,6 +184,7 @@ const BindPhoneNumberJob = async (job: Job<JobData>) => {
                 message: `Número vinculado: ${phoneNumber}`,
                 date: new Date()
             })
+            account.statusReason = "";
             await account.save();
             await job.updateProgress("Finalizando");
             await job.updateData({

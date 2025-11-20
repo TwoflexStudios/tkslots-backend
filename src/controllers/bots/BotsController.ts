@@ -33,7 +33,7 @@ class BotsController {
                     }
                 },
                 siteId: siteId
-            })
+            }, {attempts: 2})
         }
 
         return SendResponse(res, {

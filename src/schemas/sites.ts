@@ -16,6 +16,8 @@ export interface SiteServerInfo {
 }
 
 export interface SitesSchema {
+  url: string;
+  mode: "automatic" | "manual";
   defaultChannel: string;
   translateRate: number;
   bTranslateCoin: boolean;
@@ -66,6 +68,8 @@ const ServerInfo = new Schema<SiteServerInfo>({
 })
 
 const SitesModel = new Schema<SitesSchema>({
+    url: String,
+    mode: String,
     defaultChannel: String,
     translateRate: Number,
     bTranslateCoin: Boolean,

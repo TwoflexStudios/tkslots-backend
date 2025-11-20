@@ -9,7 +9,8 @@ export enum PermissionsEnum {
     ALL = "all",
     SITES = "sites",
     PLAY_GAME = "play_game",
-    CREATE_BOTS = "create_bots"
+    CREATE_BOTS = "create_bots",
+    QUEUE = "queue"
 }
 
 interface UsersModel {

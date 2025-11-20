@@ -15,7 +15,7 @@ const pendingBinding = async (job: Job) => {
         "Bind Phone", 
         {accountId: item._id},
         {
-            attempts: 3,
+            attempts: 5,
             delay: 2000,
         }
     ))
