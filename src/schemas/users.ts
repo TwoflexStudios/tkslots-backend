@@ -8,7 +8,8 @@ export enum UserStatusEnum {
 export enum PermissionsEnum {
     ALL = "all",
     SITES = "sites",
-    PLAY_GAME = "play_game"
+    PLAY_GAME = "play_game",
+    CREATE_BOTS = "create_bots"
 }
 
 interface UsersModel {

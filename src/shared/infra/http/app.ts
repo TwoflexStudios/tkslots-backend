@@ -3,17 +3,15 @@ import cors from "cors";
 import routes from "./routes/base";
 import { BullMonitorExpress } from "tk-monitor/src/express";
 import { BullMQAdapter } from "tk-monitor/src/root/bullmq-adapter";
-import { BindCronQueue, BindQueue, CheckinCronQueue, CheckinQueue } from "../../../bull/queues";
-import { Namespace, Server, Socket } from "socket.io";
-import { DecodeToken, UserAuthenticated } from "../../../services/token";
+import { AddBotsQueue, BindCronQueue, BindQueue, CheckinCronQueue, CheckinQueue } from "../../../bull/queues";
+import { Namespace, Server } from "socket.io";
+import { ConnectedUser } from "../socket/types";
+import { registerSocketListeners } from "../socket/listeners";
+
+export const AUTH_USER_ROOM = "authenticated";
 
 interface SocketList {
     desk: Namespace,
-}
-
-interface ConnectedUser {
-    user: UserAuthenticated,
-    socket: Socket
 }
 
 class App {
@@ -44,48 +42,8 @@ class App {
         this.socket.desk = io.of("/desk");
 
         this.socket.desk.on("connection", (socket) => {
-            socket.on("enter", async ({token}: {token: string}) => {
-                const decoded = await DecodeToken(token);
-                if(decoded){
-                    this.connectedUsers.push({
-                        user: decoded,
-                        socket: socket
-                    });
-
-                    socket.on("message", ({message, username}) => {
-                        socket.broadcast.emit("message", {message, username});
-                    });
-
-                    socket.on("disconnect", () => {
-                        this.connectedUsers = this.connectedUsers.filter(user => user.socket.id !== socket.id);
-                        this.connectedUsers.forEach(user => {
-                            user.socket.emit("online_users", this.connectedUsers.map(user => {
-                                return {
-                                    id: user.user.id,
-                                    name: user.user.name,
-                                }
-                            }));
-                        });
-                    });
-
-                    socket.on("get_online_users", () => {
-                        socket.emit("online_users", this.connectedUsers.map(user => {
-                            return {
-                                id: user.user.id,
-                                name: user.user.name,
-                            }
-                        }));
-                    });
-
-                    this.connectedUsers.forEach(user => {
-                        user.socket.emit("online_users", this.connectedUsers.map(user => {
-                            return {
-                                id: user.user.id,
-                                name: user.user.name,
-                            }
-                        }));
-                    });
-                }
+            registerSocketListeners(socket, {
+                connectedUsers: this.connectedUsers
             });
         });
     }
@@ -108,6 +66,7 @@ class App {
                 new BullMQAdapter(CheckinCronQueue as any),
                 new BullMQAdapter(BindQueue as any),
                 new BullMQAdapter(CheckinQueue as any),
+                new BullMQAdapter(AddBotsQueue as any),
             ],
             gqlIntrospection: true,
             metrics: {

@@ -1,4 +1,4 @@
-import AccountsModel, { AccountLoginTypeEnum, AccountsSchema, PlatformEnum } from "../../../schemas/accounts";
+import AccountsModel, { AccountLoginTypeEnum, AccountsSchema, AccountStatusEnum, PlatformEnum } from "../../../schemas/accounts";
 import sitesModel from "../../../schemas/sites";
 import { EncodePayload, getServerSyncToken, slotsApi } from "../server";
 import { getProxyAgent } from "../../../helpers/proxy";
@@ -33,7 +33,7 @@ interface RegisterWithDeviceOptions {
     }
 }
 
-type RegisterOptionsBase = RegisterWithPhoneNumberOptions | RegisterWithDeviceOptions
+export type RegisterOptionsBase = RegisterWithPhoneNumberOptions | RegisterWithDeviceOptions
 
 interface CreationResultError {
     status: false,

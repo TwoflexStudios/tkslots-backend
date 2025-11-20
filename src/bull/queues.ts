@@ -6,9 +6,11 @@ export enum QueuesEnum {
     ACCOUNT_BIND_PHONE = "ACCOUNT_BIND_PHONE",
     FETCH_PENDING_CHECKIN = "FETCH PENDING CHECKIN",
     ACCOUNT_CHECKIN = "ACCOUNT_CHECKIN",
+    ADD_BOT = "ADD_BOT",
 }
 
 export const BindCronQueue = new Queue(QueuesEnum.FETCH_PENDING_BIND, {connection: redisClient});
+export const AddBotsQueue = new Queue(QueuesEnum.ADD_BOT, {connection: redisClient});
 export const CheckinCronQueue = new Queue(QueuesEnum.FETCH_PENDING_CHECKIN, {connection: redisClient});
 export const BindQueue = new Queue(QueuesEnum.ACCOUNT_BIND_PHONE, {connection: redisClient});
 export const CheckinQueue = new Queue(QueuesEnum.ACCOUNT_CHECKIN, {connection: redisClient});

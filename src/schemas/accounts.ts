@@ -90,6 +90,7 @@ interface AccountState {
 export interface AccountsSchema {
     siteId: mongoose.Types.ObjectId;
     userId: mongoose.Types.ObjectId | null;
+    bucketId: mongoose.Types.ObjectId | null;
     uid: number | null;
     username: string | null;
     vipLevel: number;
@@ -170,6 +171,7 @@ const AccountStateSchema = new Schema({
 const AccountsSchemaMongoose = new Schema<AccountsSchema>({
     siteId: { type: Schema.Types.ObjectId, required: true, ref: "sites" },
     userId: { type: Schema.Types.ObjectId, ref: "users", default: null },
+    bucketId: { type: Schema.Types.ObjectId, ref: "buckets", default: null },
     uid: { type: Number, default: null },
     username: { type: String, default: null },
     vipLevel: { type: Number, default: 0 },

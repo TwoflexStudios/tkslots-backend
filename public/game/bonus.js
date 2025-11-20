@@ -53,7 +53,9 @@ function closeBypassModal() {
 window.bypassCompleted = () => {
     try{
         const accountId = window.GAME_DATA.account._id;
-        window.parent.postMessage({ type: "bypass-completed", data: {accountId: accountId} }, "*");
+        const siteName = window.GAME_DATA.localConfig.gameTitle;
+        const deviceId = window.GAME_DATA.account.device.id;
+        window.parent.postMessage({ type: "bypass-completed", data: {accountId, siteName, deviceId} }, "*");
 
         const modal = document.getElementById('bypassModal');
         modal.style.display = 'none';

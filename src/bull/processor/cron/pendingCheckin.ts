@@ -8,6 +8,7 @@ const pendingCheckin = async (job: Job) => {
         $or: [
             {
                 lastCheckin: null,
+                uid: {$ne: null}
             },
             {
                 lastCheckin: {

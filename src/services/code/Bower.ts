@@ -124,7 +124,7 @@ class BowerModule {
 
     async getCode(activationId: string) {
         try {
-            const { data } = await this.api.get("", {
+            const { data } = await this.api.get("/stubs/handler_api.php", {
                 params: {
                     action: "getStatus",
                     id: activationId,

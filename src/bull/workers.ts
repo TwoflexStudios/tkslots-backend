@@ -5,6 +5,7 @@ import BindPhoneNumberJob from "./processor/account/binding";
 import pendingBinding from "./processor/cron/pendingBinding";
 import pendingCheckin from "./processor/cron/pendingCheckin";
 import CheckinJob from "./processor/account/checkin";
+import addBotJob from "./processor/bots/add";
 
 
 /**
@@ -46,3 +47,14 @@ CreateWorker({
     connection: redisClient,
     concurrency: 5,
 })
+
+/**
+ * ADD BOTS
+ */
+CreateWorker({
+    name: QueuesEnum.ADD_BOT,
+    callback: addBotJob,
+    connection: redisClient,
+    concurrency: 5,
+})
+

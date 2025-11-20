@@ -9,7 +9,7 @@ export enum GameStatusEnum {
     PLAYING = 3,
 }
 
-interface BetController {
+export interface BetController {
     [amount: number]: {
         bet: number
     }

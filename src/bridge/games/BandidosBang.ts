@@ -1,5 +1,6 @@
 import { Delay } from "../../helpers/delay";
 import { toBRL } from "../../helpers/toBRL";
+import { GamesEnum } from "../../schemas/bucket";
 import { csGameRoll, scGameRoll } from "../../types/protobuff/bandidos_bang";
 import Game, { GameOptions, GameStatusEnum } from "./Game";
 
@@ -46,7 +47,7 @@ class BandidosBangGame extends Game {
     public options: BandidosBangGameOptions;
 
     constructor(options: BandidosBangGameOptions) {
-        super(100042, "Bandidos Bang", commands, options);
+        super(100042, GamesEnum.BandidosBang, commands, options);
         this.options = options;
     }
 
