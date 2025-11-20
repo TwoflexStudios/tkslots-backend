@@ -1,69 +1,97 @@
 import mongoose, { Schema } from "mongoose";
-import { BetController } from "../bridge/games/Game";
 
-export enum GamesEnum {
-    BandidosBang = "bandidos_bang",
-    
+export enum BucketTypeEnum {
+    EVENT = "event",
+    GAME = "game"
 }
 
 export enum BucketStatusEnum {
+    SCHEDULED = "scheduled",
     PENDING = "pending",
     RUNNING = "running",
-    PAUSED = "paused",
-    STOPPED = "stopped",
-    COMPLETED = "completed",
-    FAILED = "failed",
+    ENDED = "ended",
+    PAUSED = "paused"
 }
 
-interface GameOptions {
+export enum EventBucketTypeEnum {
+    BONUS_EMAIL = "bonus_email",
+    
+}
+
+export interface GameOptions {
     minToWin: number;
-    betController: BetController;
+    betController: object;
+    attributes?: object;
 }
 
-interface options {
-    bots: number; // number of bots to play
-    minBalance: number; // minimum balance of bots to start
-    repeat: "none" | "daily" | "weekly" | "monthly";
-    repeatTime: string; //ex: 06:00
-    gameOptions: GameOptions;
+export interface RepeatOptions {
+    type: "none" | "daily" | "weekly" | "monthly" | "seconds" | "minutes" | "hours";
+    time: string;
 }
 
-interface BucketSchema {
-    site: mongoose.Types.ObjectId;
-    name: string;
-    status: BucketStatusEnum;
-    game: GamesEnum;
-    options: options;
+export interface EventBucket {
+    type: EventBucketTypeEnum;
     startAt: Date;
+    endAt: Date;
+}
+
+export interface GameBucket {
+    game: string;
+    options: GameOptions;
+}
+
+
+export interface BucketSchema {
+    name: string;
+    site: string;
+    bots: number;
+    type: BucketTypeEnum;
+    bucket: EventBucket | GameBucket;
+    repeat: RepeatOptions;
+    status: BucketStatusEnum;
+    startAt?: Date;
     createdAt: Date;
     updatedAt: Date;
 }
 
-const BucketOptionsSchema = new Schema<options>({
-    bots: { type: Number, default: 50 },
-    minBalance: { type: Number, default: 10 },
-    repeat: { type: String, enum: ["none", "daily", "weekly", "monthly"], default: "none" },
-    repeatTime: { type: String, default: "" },
-    gameOptions: {
-        minToWin: { type: Number, default: 150 },
-        betController: { type: Object, default: {} }
-    }
-})
-
 const BucketModel = new Schema<BucketSchema>({
-    site: { type: Schema.Types.ObjectId, required: true, ref: "sites" },
-    name: { type: String, default: "" },
-    game: {
+    name: {
         type: String,
-        enum: GamesEnum,
-        default: GamesEnum.BandidosBang
+        required: true
     },
-    options: BucketOptionsSchema,
-    startAt: { type: Date, default: Date.now },
+    site: {
+        type: String,
+        required: true
+    },
+    bots: {
+        type: Number,
+        required: true
+    },
+    type: {
+        type: String,
+        required: true
+    },
+    bucket: {
+        type: Object,
+        required: true
+    },
+    repeat: {
+        type: Object,
+        default: null
+    },
     status: {
         type: String,
-        enum: BucketStatusEnum,
         default: BucketStatusEnum.PENDING
+    },
+    startAt: {
+        type: Date,
+        default: null
+    },
+    createdAt: {
+        type: Date
+    },
+    updatedAt: {
+        type: Date
     }
 }, { timestamps: true })
 

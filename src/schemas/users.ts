@@ -10,7 +10,12 @@ export enum PermissionsEnum {
     SITES = "sites",
     PLAY_GAME = "play_game",
     CREATE_BOTS = "create_bots",
-    QUEUE = "queue"
+    QUEUE = "queue",
+    READ_BUCKETS = "read_buckets",
+    CREATE_BUCKETS = "create_buckets",
+    UPDATE_BUCKETS = "update_buckets",
+    DELETE_BUCKETS = "delete_buckets",
+    START_BUCKETS = "start_buckets",
 }
 
 interface UsersModel {

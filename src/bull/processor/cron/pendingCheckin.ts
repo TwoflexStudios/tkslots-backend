@@ -23,7 +23,7 @@ const pendingCheckin = async (job: Job) => {
         {accountId: item._id},
         {
             attempts: 5,
-            delay: 2000,
+            delay: Math.floor(Math.random() * (120000 - 5000 + 1)) + 5000,
         }
     ))
 }
