@@ -29,10 +29,7 @@ GameHostRoutes.get(
         template = template.split("{{thisUrl}}").join(config.get("thisUrl"))
         template = template.split("{{game_data}}").join(`
             window.GAME_DATA = {
-                account: ${JSON.stringify({
-                    ...(accountData)._doc as any,
-                    states: {}
-                })},
+                account: ${JSON.stringify(accountData)},
                 localConfig: ${JSON.stringify({
                     ...accountData.siteId,
                     bFastLogin: true,
