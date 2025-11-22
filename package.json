@@ -33,7 +33,7 @@
     "pino-pretty": "^13.1.2",
     "protobufjs": "^7.5.4",
     "socket.io": "^4.8.1",
-    "tk-monitor": "file:./tk-monitor-module",
+    "tk-monitor": "file:./tk-monitor",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.9.3",
     "ws": "^8.18.3"

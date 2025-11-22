@@ -6,7 +6,7 @@ WORKDIR /usr/tkpcw/api
 COPY package.json yarn.lock ./
 
 # 2. Copia o módulo local
-COPY ./tk-monitor-module ./tk-monitor-module
+COPY ./tk-monitor ./tk-monitor
 
 # 3. Instala e builda o módulo com Yarn
 RUN cd tk-monitor-module && yarn install
