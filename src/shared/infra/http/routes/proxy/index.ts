@@ -19,7 +19,7 @@ const MIME_TYPES: Record<string, string> = {
     '.svg': 'image/svg+xml',
 };
 
-ProxyRoutes.all('/:agent?', async (req, res) => {
+ProxyRoutes.all('{/:agent}', async (req, res) => {
     const gameAsset = req.query["game-asset"] as string;
     let target: string | undefined = req.query.url as string;
 
