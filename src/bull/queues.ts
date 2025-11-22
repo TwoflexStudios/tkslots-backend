@@ -45,7 +45,7 @@ RunScheduledBucketsQueue.add(
     {},
     {
         repeat: {
-            every: 5 * 60 * 1000 // 5 minutos
+            every: 1 * 60 * 1000 // 1 minuto
         },
         jobId: "run-scheduled-buckets" // garante que só existe um
     }
