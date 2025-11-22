@@ -1,5 +1,5 @@
 import Game from "./bridge/Game";
-import BandidosBang from "./bridge/Games/BandidosBang";
+import BandidosBang from "./bridge/games/BandidosBang";
 import Player, { PlayerEventEnum } from "./bridge/Player";
 
 const DevelopFunction = async () => {

@@ -6,7 +6,7 @@ import { AUTH_USER_ROOM, useApplication } from "../shared/infra/http/app";
 import Player, { PlayerEventEnum } from "./Player";
 import logger from "../config/pino";
 import { format } from "date-fns";
-import BandidosBang from "./Games/BandidosBang";
+import BandidosBang from "./games/BandidosBang";
 import { toBRL } from "../helpers/toBRL";
 import Game, { GameEventEnum, GameRoll } from "./Game";
 import { Delay } from "../helpers/delay";
