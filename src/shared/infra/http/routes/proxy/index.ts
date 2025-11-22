@@ -1,48 +1,50 @@
 import { Router } from "express";
 import fs from "fs";
-import logger from "../../../../../config/pino";
-import config from "../../../../../config/convict";
+import path from "path";
 import axios from "axios";
+import config from "../../../../../config/convict";
 import { getProxyAgent } from "../../../../../helpers/proxy";
 
 const ProxyRoutes = Router();
 
-ProxyRoutes.all('{/:agent}', async (req, res) => {
-    const gameAsset = req.query["game-asset"];
-    let target: any = req.query.url;
+const MIME_TYPES: Record<string, string> = {
+    '.js': 'text/javascript',
+    '.css': 'text/css',
+    '.html': 'text/html',
+    '.json': 'application/json',
+    '.png': 'image/png',
+    '.jpg': 'image/jpeg',
+    '.jpeg': 'image/jpeg',
+    '.gif': 'image/gif',
+    '.svg': 'image/svg+xml',
+};
+
+ProxyRoutes.all('/:agent?', async (req, res) => {
+    const gameAsset = req.query["game-asset"] as string;
+    let target: string | undefined = req.query.url as string;
+
+    // Copia headers do cliente, removendo os que não devem ser encaminhados
     const headers = { ...req.headers };
     delete headers.host;
     delete headers.connection;
     delete headers['content-length'];
-    
-    if(gameAsset){
-        const folder = gameAsset;
-        //check if exist in public folder
-        try{
-            const file = fs.readFileSync(`./public/game/${folder}`);
-            if(file){
-                // logger.success(`Sending game asset: ${folder}`)
-                return res.send(file);
-            }
-        }catch{
-            // logger.info(`Game asset not found: ${folder}`)
-            target = `${config.get("targetUrl")}${gameAsset}`
+
+    if (gameAsset) {
+        const cachePath = path.join('./public/cache', gameAsset);
+
+        // Verifica se existe no cache
+        if (fs.existsSync(cachePath) && fs.statSync(cachePath).isFile()) {
+            const ext = path.extname(cachePath);
+            const mimeType = MIME_TYPES[ext] || 'application/octet-stream';
+            res.setHeader('Content-Type', mimeType);
+            return res.sendFile(path.resolve(cachePath));
         }
 
-        //check if exist in cache folder
-        try{
-            const file = fs.readFileSync(`./public/cache/${folder}`);
-            if(file){
-                // logger.success(`Sending game asset: ${folder}`)
-                return res.send(file);
-            }
-        }catch{
-            // logger.info(`Game asset not found: ${folder}`)
-            target = `${config.get("targetUrl")}${gameAsset}`
-        }
+        // Define target remoto se não existir no cache
+        target = `${config.get("targetUrl")}${gameAsset}`;
 
-        //baixar o arquivo
-        try{
+        try {
+            // Faz download do arquivo
             const response = await axios({
                 url: target,
                 method: req.method,
@@ -50,76 +52,68 @@ ProxyRoutes.all('{/:agent}', async (req, res) => {
                 data: req.body,
                 timeout: 20000,
                 responseType: 'stream',
-                validateStatus: () => true
+                validateStatus: () => true,
             });
-            const gameAssetPath = String(gameAsset).split("/").pop();
-             // logger.warn(`Downloading file to cache folder: ${gameAssetPath}`)
-            
-            // Extract directory path from gameAsset (remove filename)
-            // Only create directory if gameAsset contains a path (has /)
-            if(String(gameAsset).includes("/")){
-                const gameAssetDir = String(gameAsset).split("/").slice(0, -1).join("/");
-                const fullCacheDir = `./public/cache/${gameAssetDir}`;
-                
-                // Create full directory structure if not exist
-                if(!fs.existsSync(fullCacheDir)){
-                    fs.mkdirSync(fullCacheDir, { recursive: true });
-                }
+
+            // Cria diretórios necessários
+            const dir = path.dirname(cachePath);
+            if (!fs.existsSync(dir)) {
+                fs.mkdirSync(dir, { recursive: true });
             }
-            
-            // Check if target path exists and is a directory (from previous errors)
-            const targetPath = `./public/cache/${gameAsset}`;
-            if(fs.existsSync(targetPath)){
-                const stats = fs.statSync(targetPath);
-                if(stats.isDirectory()){
-                    // Remove the incorrectly created directory
-                    fs.rmSync(targetPath, { recursive: true, force: true });
-                     // logger.warn(`Removed incorrect directory: ${targetPath}`);
-                }
-            }
-            
-            //salvar o arquivo
-            const file = fs.createWriteStream(targetPath);
-            response.data.pipe(file);
-            file.on('finish', () => {
-                file.close();
-                // logger.success(`Downloaded game asset: ${gameAsset}`)
+
+            // Salva arquivo no cache
+            const writer = fs.createWriteStream(cachePath);
+            response.data.pipe(writer);
+
+            writer.on('finish', () => {
+                // Nada a fazer aqui, arquivo salvo no cache
             });
-        }catch(ex: any){
-            // logger.info(`Failed to download game asset: ${gameAsset} ${ex?.message}`)
-            target = `${config.get("targetUrl")}${gameAsset}`
+            writer.on('error', () => {
+                // Ignora erro no cache, continuará proxy normal
+            });
+
+        } catch (err) {
+            // Se download falhar, continua com proxy direto
         }
     }
 
-    const { agent } = req.params;
     if (!target) {
         return res.status(400).send('Parâmetro "url" é obrigatório. Ex: /?url=https://example.com/path');
     }
 
     try {
-        // Copia headers do cliente, removendo headers que não devem ser encaminhados
-     
+        const { agent } = req.params;
 
         const response = await axios({
             url: target,
             method: req.method,
             headers,
-            data: req.body, 
+            data: req.body,
             timeout: 20000,
             responseType: 'stream',
             ...(agent && { httpAgent: getProxyAgent(agent) }),
             ...(agent && { httpsAgent: getProxyAgent(agent) }),
-            validateStatus: () => true
+            validateStatus: () => true,
         });
 
+        // Filtra headers problemáticos
+        const headersToSend: Record<string, string> = {};
+        Object.entries(response.headers).forEach(([key, value]) => {
+            const forbidden = ['content-encoding', 'transfer-encoding', 'connection'];
+            if (!forbidden.includes(key.toLowerCase()) && value) {
+                headersToSend[key] = value as string;
+            }
+        });
 
-        // console.log(response)
+        // Corrige MIME type para JS e outros
+        const ext = path.extname(gameAsset || '');
+        if (MIME_TYPES[ext]) {
+            headersToSend['Content-Type'] = MIME_TYPES[ext];
+        }
 
-        // Encaminha os headers da resposta
-        res.writeHead(response.status, response.headers as any);
-
-        // Faz pipe da resposta para o cliente
+        res.writeHead(response.status, headersToSend);
         response.data.pipe(res);
+
     } catch (err: any) {
         if (err.code === 'ECONNABORTED') {
             return res.status(504).send('Timeout ao conectar com o servidor de destino.');
