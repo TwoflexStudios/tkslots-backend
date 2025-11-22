@@ -7,6 +7,7 @@ import { passwordGen } from "../../../helpers/simulation";
 
 interface RegisterWithPhoneNumberOptions {
     mode: AccountLoginTypeEnum.PHONE_NUMBER,
+    allowCheckin?: boolean,
     source?: string;
     account: {
         phoneNumber: string;
@@ -24,6 +25,7 @@ interface RegisterWithPhoneNumberOptions {
 interface RegisterWithDeviceOptions {
     mode: AccountLoginTypeEnum.GUEST,
     needPhone?: boolean;
+    allowCheckin?: boolean,
     source?: string;
     device: {
         id: string;
@@ -140,6 +142,7 @@ const CreateAccount = async (siteId: string, options: RegisterOptionsBase): Prom
             //Register with successfull
             const account = new AccountsModel({
                 siteId: siteInfo._id,
+                allowCheckin: options.allowCheckin,
                 login: {
                     type: options.mode,
                     device: options.device,

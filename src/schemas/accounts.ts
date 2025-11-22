@@ -94,6 +94,7 @@ export interface AccountsSchema {
     bucketId: mongoose.Types.ObjectId | null;
     uid: number | null;
     username: string | null;
+    allowCheckin: boolean;
     vipLevel: number;
     source?: string;
     status: AccountStatusEnum;
@@ -176,6 +177,7 @@ const AccountsSchemaMongoose = new Schema<AccountsSchema>({
     uid: { type: Number, default: null },
     username: { type: String, default: null },
     vipLevel: { type: Number, default: 0 },
+    allowCheckin: { type: Boolean, default: true },
     needPhone: { type: Boolean, default: false },
     source: { type: String, default: null },
     annotations: {

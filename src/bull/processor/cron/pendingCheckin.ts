@@ -9,6 +9,7 @@ const pendingCheckin = async (job: Job) => {
 
     const accounts = await AccountsModel.find({
         status: AccountStatusEnum.IDLE, // Somente contas parada
+        allowCheckin: true,
         $or: [
             {
                 lastCheckin: null,
@@ -21,8 +22,6 @@ const pendingCheckin = async (job: Job) => {
             }
         ]
     });
-    
-    
 
     accounts.map(item => {
         if(!delayMultiplyGroup[item.siteId.toString()]){
@@ -36,7 +35,7 @@ const pendingCheckin = async (job: Job) => {
             {accountId: item._id},
             {
                 attempts: 5,
-                delay: (Math.floor(Math.random() * (10000 - 5000 + 1)) + 5000) * delayMultiplyGroup[item.siteId.toString()],
+                delay: (Math.floor(Math.random() * (5000 - 3000 + 1)) + 3000) * delayMultiplyGroup[item.siteId.toString()],
             }
         )
     })
