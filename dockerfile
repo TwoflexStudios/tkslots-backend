@@ -8,8 +8,7 @@ COPY package.json yarn.lock ./
 # 2. Copia o módulo local
 COPY ./tk-monitor ./tk-monitor
 
-# 3. Instala e builda o módulo com Yarn
-RUN cd tk-monitor-module && yarn install
+RUN cd tk-monitor && yarn install
 
 # 4. Instala dependências da API (incluindo tk-monitor via file:)
 RUN yarn install
