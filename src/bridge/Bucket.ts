@@ -225,7 +225,7 @@ class Bucket {
 
             const game = new Game(player, {
                 minToWin: gameBucket.options.minToWin,
-                attributes: gameBucket.options.attributes as any,
+                attributes: gameBucket?.options?.attributes || {} as any,
                 controller: gameBucket.options.betController
             })
 
