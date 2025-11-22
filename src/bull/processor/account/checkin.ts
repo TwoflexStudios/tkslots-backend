@@ -11,6 +11,8 @@ const CheckinJob = async (job: Job<JobData>) => {
     let account = await AccountsModel.findOne({ _id: accountId });
     if (!account) throw new Error("Conta não encontrada");
 
+    if(account.status !== AccountStatusEnum.IDLE) throw new Error("A conta não está livre");
+
     account.status = AccountStatusEnum.BUSY;
     account.statusReason = "Fazendo checkin diário";
     await account.save();
