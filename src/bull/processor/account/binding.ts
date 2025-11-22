@@ -45,7 +45,7 @@ const BindPhoneNumberJob = async (job: Job<JobData>) => {
 
     const siteInfo = await sitesModel.findOne({ _id: account.siteId });
 
-    if (account.states.retries.bind >= 5 || job.attemptsMade >= 5) {
+    if (account.states.retries.bind >= 4 || job.attemptsMade >= 5) {
         await account.updateOne({ status: AccountStatusEnum.BIND_FAILED, statusReason: "Muitas tentativas de vincular telefone" });
         throw new Error("Muitas tentativas de vincular telefone");
     }

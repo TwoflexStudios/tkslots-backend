@@ -1,53 +1,60 @@
-import GameSocketBridge from "./bridge/protocol/GameSocketBridge";
-import GameProtocolHelper from "./bridge/protocol/GameProtocolHelper";
-import AccountsModel from "./schemas/accounts";
-import ApiLogin from "./bridge/api/account/login";
-import { getProxyAgent } from "./helpers/proxy";
-import Player from "./bridge/Player";
-import GameRunner from "./bridge/GameRunner";
-import GameDesk from "./bridge/GameDesk";
-import BandidosBangGame from "./bridge/games/BandidosBang";
-import crypto from "crypto";
+import Game from "./bridge/Game";
+import BandidosBang from "./bridge/Games/BandidosBang";
+import Player, { PlayerEventEnum } from "./bridge/Player";
 
 const DevelopFunction = async () => {
     
-    const player = new Player("691abdf0ce62648bbd365d59");
-    const loginResult = await player.connect();
+    const player = new Player("691e9a4794ef0d5aff97049d");
 
-    if(!loginResult.status){
-        console.log(loginResult.message, "Erro ao conectar")
-        return;
-    }
-
-    const bandidosBang = new BandidosBangGame({
-        minToWin: 100,
-        betController: {
-            0.1: {
-                bet: 0.1
+    player.on(PlayerEventEnum.CONNECTED, () => {
+        console.log("Conectado");
+        const game = new BandidosBang(player, {
+            minToWin: 100,
+            attributes: {
+                type: 1
             },
-            0.2: {
-                bet: 0.2
-            },
-            0.4: {
-                bet: 0.4
-            },
-            0.6: {
-                bet: 0.6
-            },
-            0.8: {
-                bet: 0.8
-            },
-            1: {
-                bet: 0.8,
+            controller: {
+                0.1: {
+                    bet: 0.1
+                },
+                0.2: {
+                    bet: 0.2
+                },
+                0.4: {
+                    bet: 0.4
+                },
+                0.6: {
+                    bet: 0.6
+                },
+                0.8: {
+                    bet: 0.8
+                },
+                1: {
+                    bet: 1,
+                },
+                10: {
+                    bet: 2
+                },
+                15: {
+                    bet: 4
+                },
+                60: {
+                    bet: 8
+                }
             }
-        }
-    });
+        });
+        game.startGame();
+    })
 
-    const runner = new GameRunner(bandidosBang, player.socket.protocolHelper);
-    const game = new GameDesk(player, runner);
+    player.on(PlayerEventEnum.CONNECTION_LOST, () => {
+        console.log("Conexão perdida");
+    })
 
-    await game.startGame();
+    player.on(PlayerEventEnum.DISCONNECTED, () => {
+        console.log("Desconectado");
+    })
 
+    await player.connect();
 }
 
 export default DevelopFunction;

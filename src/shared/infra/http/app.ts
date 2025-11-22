@@ -9,6 +9,7 @@ import { ConnectedUser } from "../socket/types";
 import { registerSocketListeners } from "../socket/listeners";
 import AuthController from "../../../services/authvalidation";
 import { PermissionsEnum } from "../../../schemas/users";
+import { EventEmitter } from "stream";
 
 export const AUTH_USER_ROOM = "authenticated";
 
@@ -16,7 +17,7 @@ interface SocketList {
     desk: Namespace,
 }
 
-class App {
+class App extends EventEmitter {
     private static instance: App | null = null;
 
     public app: express.Application;
@@ -28,6 +29,7 @@ class App {
 
     // Construtor privado → só pode ser criado via getInstance()
     private constructor() {
+        super();
         this.app = express();
         this.customize();
     }

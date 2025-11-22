@@ -1,12 +1,7 @@
 import { Delay } from "../../helpers/delay";
-import { toBRL } from "../../helpers/toBRL";
-import { GamesEnum } from "../../schemas/bucket";
 import { csGameRoll, scGameRoll } from "../../types/protobuff/bandidos_bang";
-import Game, { GameOptions, GameStatusEnum } from "./Game";
-
-interface BandidosBangGameOptions extends GameOptions {
-    
-}
+import Game, { GameEventEnum, GameOptions, GameRoll } from "../Game";
+import Player from "../Player";
 
 const commands = {
     "client": {
@@ -43,50 +38,109 @@ const commands = {
     }
 }
 
-class BandidosBangGame extends Game {
-    public options: BandidosBangGameOptions;
+interface Callbacks {
+    onWinner: (balance: number) => void;
+    onLoser: (balance: number) => void;
+    onSpin: (bet: number) => void;
+    onSpinResult: (result: GameRoll) => void;
+    onTimeout: () => void;
+}
 
-    constructor(options: BandidosBangGameOptions) {
-        super(100042, GamesEnum.BandidosBang, commands, options);
-        this.options = options;
+interface BandidosBangAttributes {
+    type: number;
+}
+
+class BandidosBang extends Game<BandidosBangAttributes> {
+
+    private attemps: number = 0;
+
+    public callbacks: Callbacks = {
+        onWinner: (balance: number) => { },
+        onLoser: (balance: number) => { },
+        onSpin: (bet: number) => { },
+        onSpinResult: (result: GameRoll) => { },
+        onTimeout: () => { }
     }
 
-    start() {
-        this.desk.socket.request("c2s_auto_sit", {});
-        this.desk.socket.on("s2c_g_state" as any, (data) => {
-            console.log(data, "STATE")
+    constructor(player: Player, options: GameOptions<BandidosBangAttributes>, callbacks?: Callbacks) {
+        super(player, 100042, options, commands);
+        this.callbacks = callbacks || this.callbacks;
+    }
+
+    async startGame() {
+        await this.connect();
+
+        while (this.deskInfo === null) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+        }
+
+        this.socket.on("s2c_sit", ({ data }: { data: any }) => {
+            this.play();
         })
-        this.roll();
+
+        await this.socket.requestAsync("c2s_auto_sit", {});
     }
 
-    async roll() {
-        if(!this.check()) return;
-        await Delay(2); // Aguarda 2 segundos para garantir que o jogo esteja pronto
-        this.desk.onRoll(this.bet)
+    private async play() {
+        if(!this.socket) return;
+        
+        if (this.attemps >= 3) {
+            this.callbacks.onTimeout();
+            this.emit(GameEventEnum.TIMEOUT);
+            return;
+        }
 
-        const rollResult = await this.desk.socket.requestAsync<scGameRoll, csGameRoll>("c2s_game_roll" as any, {
+        this.calculateBet();
+        this.log(`⏳ Saldo: ${this.balance / 100} | Aposta: ${this.bet / 100}`);
+
+        if (this.balance < this.bet) {
+            this.emit(GameEventEnum.LOSE, { balance: this.balance })
+            this.callbacks.onLoser(this.balance);
+            this.log(`❌ Saldo: ${this.balance / 100} | Aposta: ${this.bet / 100}`);
+            return;
+        }
+
+        this.callbacks.onSpin(this.bet);
+        this.emit(GameEventEnum.SPINING, { bet: this.bet })
+
+        const result = await this.socket.requestAsync<scGameRoll, csGameRoll>("c2s_game_roll" as any, {
             data: {
                 betScore: this.bet,
-                type: 1
+                type: this.options.attributes.type
             }
-        }, 5000)
-
-        if(rollResult === "TIMEOUT") {
-            this.roll();
-            return;
-        };
-
-        const { data } = rollResult;
-        
-        this.result({
-            bet: this.bet,
-            balance: data.userScore,
-            winAmount: data.winScore,
-            bonus: false
         })
 
-        this.roll();
+        if (result === "TIMEOUT") {
+            this.attemps += 1;
+            return;
+        }
+
+        const spinResult = {
+            balance: this.balance / 100,
+            oldBalance: Number(this.balance) / 100 - Number(result.data.winScore / 100) - Number(this.bet / 100),
+            winAmount: result.data.winScore / 100,
+            bet: this.bet / 100
+        }
+
+        this.emit(GameEventEnum.SPIN_RESULT, spinResult)
+
+        this.callbacks.onSpinResult(spinResult);
+
+        this.balance = result.data.userScore;
+
+        if (Number(this.balance) / 100 >= this.options.minToWin) {
+            //Winner
+            this.log(`✅ Saldo: ${this.balance / 100} | Aposta: ${this.bet / 100} | Ganhou: ${result.data.winScore / 100}`);
+            this.callbacks.onWinner(this.balance);
+            this.emit(GameEventEnum.WIN, { balance: this.balance })
+            return;
+        }
+
+        this.log(`⚽ Saldo: ${this.balance / 100} | Aposta: ${this.bet / 100} | Ganhou: ${result.data.winScore / 100}`);
+
+        await Delay(3);
+        this.play();
     }
 }
 
-export default BandidosBangGame;
+export default BandidosBang;

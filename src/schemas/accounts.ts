@@ -88,6 +88,7 @@ interface AccountState {
 }
 
 export interface AccountsSchema {
+    _id: mongoose.Types.ObjectId;
     siteId: mongoose.Types.ObjectId;
     userId: mongoose.Types.ObjectId | null;
     bucketId: mongoose.Types.ObjectId | null;

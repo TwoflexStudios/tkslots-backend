@@ -1,11 +1,14 @@
 import protobuf from 'protobufjs'
 import { GameSocketResponse, Header, Packet } from '../../types/GameNetNode';
-import { Client2ServerCommands, GetServerCommandByMainIdAndAssistantId } from '../../helpers/commands';
+import { Client2ServerCommands, GetServerCommandByMainIdAndAssistantId, Server2ClientCommands } from '../../helpers/commands';
 import fs from "fs";
 import path from 'path';
 
 class GameProtocolHelper {
     public protobuff: protobuf.Root = new protobuf.Root();
+
+    private client2ServerCommands = Client2ServerCommands;
+    private server2ClientCommands = Server2ClientCommands;
    
     getHeadlen = () => 20
 
@@ -16,6 +19,11 @@ class GameProtocolHelper {
     header2Cmd(header: Header, addOne = false) {
         const base = `${header.bMainID}.${header.bAssistantID}`;
         return addOne ? `${header.bMainID}.${header.bAssistantID as any + "1"}` : `${base}0`;
+    }
+
+    setCommands(commands: {client: any, server: any}){
+        this.client2ServerCommands = commands.client;
+        this.server2ClientCommands = commands.server;
     }
 
     /**
@@ -52,11 +60,11 @@ class GameProtocolHelper {
      * @param buffer 
      * @returns [CMD, PACKET] | undefined
     */
-    encodePayload(action: keyof typeof Client2ServerCommands, packet: Packet): [string, Packet] | undefined {
+    encodePayload(action: keyof typeof this.client2ServerCommands, packet: Packet): [string, Packet] | undefined {
         // console.log(`Codificando: ${JSON.stringify(packet)}, comando: ${action}`);
 
         if (!packet.header) return;
-        const commandData = Client2ServerCommands[action];
+        const commandData = this.client2ServerCommands[action];
         if (!commandData) return;
 
         const cmd = `${packet.header.bMainID}.${packet.header.bAssistantID}`;
@@ -115,7 +123,7 @@ class GameProtocolHelper {
             inbReserve: buffer.readInt32LE(16)
         };
 
-        const command = GetServerCommandByMainIdAndAssistantId(head.bMainID, head.bAssistantID)
+        const command = GetServerCommandByMainIdAndAssistantId(head.bMainID, head.bAssistantID, this.server2ClientCommands)
 
         const payload = buffer.slice(20);
 

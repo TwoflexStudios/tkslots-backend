@@ -16,6 +16,8 @@ export enum PermissionsEnum {
     UPDATE_BUCKETS = "update_buckets",
     DELETE_BUCKETS = "delete_buckets",
     START_BUCKETS = "start_buckets",
+    NOTIFICATION_WIN = "notification_win",
+    NOTIFICATION_BUCKETS = "notification_buckets"
 }
 
 interface UsersModel {

@@ -1839,6 +1839,29 @@ export const PushCommands = (scope: "client" | "server", commands: any) => {
     //console.log(`${Object.keys(commands).length} Commands pushed in ${scope} Scope`)
 }
 
+export const MergeCommands = (commands: any) => {
+    const clientsComands = Client2ServerCommands;
+    const serverComands = Server2ClientCommands;
+
+    const client = commands.client;
+    const server = commands.server;
+
+    Object.keys(client).map(command => {
+        //@ts-expect-error
+        clientsComands[command] = client[command];
+    })
+
+    Object.keys(server).map(command => {
+        //@ts-expect-error
+        serverComands[command] = server[command];
+    })
+
+    return {
+        client: clientsComands,
+        server: serverComands
+    }
+}
+
 /**
  * Função pra obter uma template (Packet Header) vindo do servidor pelo Comando (CMD)
  * @param cmd 
@@ -1853,8 +1876,8 @@ export const GetServerCommandByCmd = (cmd: number) => {
     return command;
 }
 
-export const GetServerCommandByMainIdAndAssistantId = (mainId: number, assistantId: number) => {
-    const entries = Object.values(Server2ClientCommands);
+export const GetServerCommandByMainIdAndAssistantId = (mainId: number, assistantId: number, commands?: typeof Server2ClientCommands) => {
+    const entries = Object.values(commands || Server2ClientCommands);
     const command = entries.find((item: any) => item.mainID === mainId && item.aID === assistantId);
     return command;
 }

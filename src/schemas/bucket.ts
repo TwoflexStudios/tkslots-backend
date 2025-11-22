@@ -1,5 +1,9 @@
 import mongoose, { Schema } from "mongoose";
 
+export enum GamesEnum {
+    BANDIDOS_BANG = "bandidos_bang"
+}
+
 export enum BucketTypeEnum {
     EVENT = "event",
     GAME = "game"
@@ -15,7 +19,6 @@ export enum BucketStatusEnum {
 
 export enum EventBucketTypeEnum {
     BONUS_EMAIL = "bonus_email",
-    
 }
 
 export interface GameOptions {
@@ -36,19 +39,21 @@ export interface EventBucket {
 }
 
 export interface GameBucket {
-    game: string;
+    game: GamesEnum;
     options: GameOptions;
 }
 
 
 export interface BucketSchema {
     name: string;
-    site: string;
+    site: mongoose.Types.ObjectId;
     bots: number;
     type: BucketTypeEnum;
     bucket: EventBucket | GameBucket;
     repeat: RepeatOptions;
+    botBalance: number | null;
     status: BucketStatusEnum;
+    statusReason: string;
     startAt?: Date;
     createdAt: Date;
     updatedAt: Date;
@@ -60,8 +65,9 @@ const BucketModel = new Schema<BucketSchema>({
         required: true
     },
     site: {
-        type: String,
-        required: true
+        type: Schema.Types.ObjectId,
+        required: true,
+        ref: "sites"
     },
     bots: {
         type: Number,
@@ -75,13 +81,21 @@ const BucketModel = new Schema<BucketSchema>({
         type: Object,
         required: true
     },
+    botBalance: {
+        type: Number,
+        default: null
+    },
     repeat: {
         type: Object,
         default: null
     },
     status: {
         type: String,
-        default: BucketStatusEnum.PENDING
+        default: BucketStatusEnum.SCHEDULED
+    },
+    statusReason: {
+        type: String,
+        default: ""
     },
     startAt: {
         type: Date,

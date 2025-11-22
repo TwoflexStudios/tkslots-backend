@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import { SendResponse } from "../../helpers/res";
-import bucketModel, { BucketTypeEnum, EventBucket, EventBucketTypeEnum, GameBucket, RepeatOptions } from "../../schemas/bucket";
+import bucketModel, { BucketStatusEnum, BucketTypeEnum, EventBucket, EventBucketTypeEnum, GameBucket, RepeatOptions } from "../../schemas/bucket";
+import Bucket from "../../bridge/Bucket";
+import { useApplication } from "../../shared/infra/http/app";
 
 interface CreateBucketDTO {
     name: string;
@@ -10,6 +12,8 @@ interface CreateBucketDTO {
     bucket: EventBucket | GameBucket;
     repeat: RepeatOptions;
     startAfterCreation: boolean;
+    botBalance: number;
+    startAt: Date;
 }
 
 class BucketsController {
@@ -35,7 +39,7 @@ class BucketsController {
             filters.type = type;
         }
 
-        const buckets = await bucketModel.find(filters);
+        const buckets = await bucketModel.find(filters).sort({ _id: -1 }).populate("site");
         
         return SendResponse(res, {
             status: true,
@@ -51,7 +55,9 @@ class BucketsController {
             type, 
             bucket, 
             repeat, 
-            startAfterCreation 
+            startAfterCreation,
+            botBalance,
+            startAt
         }: CreateBucketDTO = req.body as any;
 
         const bucketData = await bucketModel.create({
@@ -61,7 +67,8 @@ class BucketsController {
             type,
             bucket,
             repeat,
-            startAfterCreation
+            botBalance,
+            startAt
         });
 
         return SendResponse(res, {
@@ -69,6 +76,46 @@ class BucketsController {
             data: bucketData
         })
 
+    }
+
+    static playBucket = async (req: Request, res: Response) => {
+        const { bucketId } = req.params;
+
+        const bucket = await bucketModel.findById(bucketId);
+
+        if (!bucket) {
+            return SendResponse(res, {
+                status: false,
+                message: "Bucket não encontrado"
+            }, 404)
+        }
+
+        if(bucket.status === BucketStatusEnum.RUNNING){
+            return SendResponse(res, {
+                status: false,
+                message: "Bucket já está em andamento"
+            }, 400)
+        }
+
+        new Bucket(String(bucketId)).start();
+
+        return SendResponse(res, {
+            status: true,
+            message: "Bucket iniciado com sucesso"
+        })
+    }
+
+    static stopBucket = async (req: Request, res: Response) => {
+        const { bucketId } = req.params;
+        await bucketModel.updateOne({ _id: bucketId }, { status: BucketStatusEnum.ENDED });
+
+        useApplication().emit(`${bucketId}:stop`);
+
+
+        return SendResponse(res, {
+            status: true,
+            message: "Bucket parado com sucesso"
+        })
     }
 
     static updateBucket = async (req: Request, res: Response) => {

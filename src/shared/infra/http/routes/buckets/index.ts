@@ -19,6 +19,18 @@ BucketsRoutes.post(
     AuthController.CheckPermission(PermissionsEnum.CREATE_BUCKETS),
     bucketsController.createBucket
 );
+BucketsRoutes.post(
+    "/play/:bucketId",
+    AuthController.HeaderAuth(),
+    AuthController.CheckPermission(PermissionsEnum.CREATE_BUCKETS),
+    bucketsController.playBucket
+);
+BucketsRoutes.post(
+    "/stop/:bucketId",
+    AuthController.HeaderAuth(),
+    AuthController.CheckPermission(PermissionsEnum.CREATE_BUCKETS),
+    bucketsController.stopBucket
+);
 BucketsRoutes.put(
     "/:bucketId",
     AuthController.HeaderAuth(),

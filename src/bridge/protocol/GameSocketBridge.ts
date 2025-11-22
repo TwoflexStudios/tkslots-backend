@@ -160,7 +160,7 @@ class GameSocketBridge extends GameSocketEventEmitter {
     }
 
     private log(value: string, type: "info" | "warn" | "error" | "debug" | "success" = "info"){
-        logger[type](`[${channels[this.options.channel || ChannelEnum.LOBBY]}:GAMESOCKET]: ${value}`)
+        // logger[type](`[${channels[this.options.channel || ChannelEnum.LOBBY]}:GAMESOCKET]: ${value}`)
     }
 
     private hasVerify() {
@@ -244,7 +244,7 @@ class GameSocketBridge extends GameSocketEventEmitter {
             header
         };
 
-        logger.info(`🔒 Socket Verified Payload Len: ${authData.length}`)
+        this.log(`🔒 Socket Verified Payload Len: ${authData.length}`, "info")
 
         // Monta e envia, mas não registra em _requests
         this.protocolHelper.encodePayload("connectVerify", packet);
