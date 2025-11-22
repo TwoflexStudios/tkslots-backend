@@ -2420,7 +2420,7 @@ thread-stream@^3.0.0:
   dependencies:
     real-require "^0.2.0"
 
-"tk-monitor@file:../tk-monitor-module":
+"tk-monitor@file:./tk-monitor-module":
   version "1.0.0"
   dependencies:
     apollo-server-express "^3.6.3"
