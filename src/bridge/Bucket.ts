@@ -216,7 +216,7 @@ class Bucket {
             this.games.push(game);
 
             game.callbacks.onWinner = async (balance: number) => {
-                this.players = this.players.filter(bot => bot.account._id.toString() !== player.account._id.toString());
+                this.players = this.players.filter(bot => bot?.account?._id?.toString() !== player.account._id.toString());
 
                 const state = player.account;
                 state.balance = balance || game.balance;
@@ -244,7 +244,7 @@ class Bucket {
             }
 
             game.callbacks.onLoser = async (balance: number) => {
-                this.players = this.players.filter(bot => bot.account._id.toString() !== player.account._id.toString());
+                this.players = this.players.filter(bot => bot?.account?._id?.toString() !== player.account._id.toString());
 
                 const state = player.account;
                 state.balance = balance || game.balance;
@@ -285,7 +285,7 @@ class Bucket {
             }
 
             game.callbacks.onTimeout = async () => {
-                this.players = this.players.filter(bot => bot.account._id.toString() !== player.account._id.toString());
+                this.players = this.players.filter(bot => bot?.account?._id?.toString() !== player.account._id.toString());
 
                 const state = player.account;
                 state.status = AccountStatusEnum.IDLE;
@@ -329,7 +329,7 @@ class Bucket {
         state.bucketId = null;
         state.statusReason = "";
 
-        this.players = this.players.filter(bot => bot.account._id.toString() !== player.account._id.toString());
+        this.players = this.players.filter(bot => bot?.account?._id?.toString() !== player.account._id.toString());
 
         player.account = state;
         await player.save();
@@ -352,7 +352,7 @@ class Bucket {
                 player.connect().then(() => this.onPlayerReady(player));
                 player.on(PlayerEventEnum.CONNECTED, () => this.onPlayerReady(player));
             }catch(ex){
-                this.players = this.players.filter(bot => bot.account._id.toString() !== player.account._id.toString());
+                this.players = this.players.filter(bot => bot?.account?._id?.toString() !== player.account._id.toString());
                 player.account.status = AccountStatusEnum.IDLE;
                 player.account.bucketId = null;
                 player.account.statusReason = `Falhou no bucket: ${this.bucket.name}`;
