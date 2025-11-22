@@ -6,6 +6,7 @@ import pendingBinding from "./processor/cron/pendingBinding";
 import pendingCheckin from "./processor/cron/pendingCheckin";
 import CheckinJob from "./processor/account/checkin";
 import addBotJob from "./processor/bots/add";
+import runScheduledBucketsJobs from "./processor/cron/runScheduledBuckets";
 
 
 /**
@@ -60,3 +61,14 @@ CreateWorker({
     concurrency: 50
 })
 
+
+/**
+ * RUN SCHEDULED BUCKETS
+ */
+CreateWorker({
+    name: QueuesEnum.RUN_SCHEDULED_BUCKETS,
+    callback: runScheduledBucketsJobs,
+    connection: redisClient,
+    concurrency: 1,
+    removeOnComplete: {count: 10},
+})

@@ -3,7 +3,7 @@ import cors from "cors";
 import routes from "./routes/base";
 import { BullMonitorExpress } from "tk-monitor/src/express";
 import { BullMQAdapter } from "tk-monitor/src/root/bullmq-adapter";
-import { AddBotsQueue, BindCronQueue, BindQueue, CheckinCronQueue, CheckinQueue } from "../../../bull/queues";
+import { AddBotsQueue, BindCronQueue, BindQueue, CheckinCronQueue, CheckinQueue, RunScheduledBucketsQueue } from "../../../bull/queues";
 import { Namespace, Server } from "socket.io";
 import { ConnectedUser } from "../socket/types";
 import { registerSocketListeners } from "../socket/listeners";
@@ -68,6 +68,7 @@ class App extends EventEmitter {
             queues: [
                 new BullMQAdapter(BindCronQueue as any),
                 new BullMQAdapter(CheckinCronQueue as any),
+                new BullMQAdapter(RunScheduledBucketsQueue as any),
                 new BullMQAdapter(BindQueue as any),
                 new BullMQAdapter(CheckinQueue as any),
                 new BullMQAdapter(AddBotsQueue as any),
