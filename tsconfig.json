@@ -9,7 +9,8 @@
     "lib": ["esnext"],
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
-    "noUncheckedSideEffectImports": true
+    "noUncheckedSideEffectImports": true,
+    "outDir": "./dist"
   },
   "include": [
     "src"
