@@ -15,7 +15,7 @@ CreateWorker({
     name: QueuesEnum.ACCOUNT_BIND_PHONE,
     callback: BindPhoneNumberJob,
     connection: redisClient,
-    concurrency: 5,
+    concurrency: 30,
 })
 
 /**
@@ -36,7 +36,7 @@ CreateWorker({
     name: QueuesEnum.FETCH_PENDING_CHECKIN,
     callback: pendingCheckin,
     connection: redisClient,
-    concurrency: 20,
+    concurrency: 1,
     removeOnComplete: {count: 10},
 })
 
@@ -47,7 +47,7 @@ CreateWorker({
     name: QueuesEnum.ACCOUNT_CHECKIN,
     callback: CheckinJob,
     connection: redisClient,
-    concurrency: 20,
+    concurrency: 50,
 })
 
 /**
@@ -57,6 +57,6 @@ CreateWorker({
     name: QueuesEnum.ADD_BOT,
     callback: addBotJob,
     connection: redisClient,
-    concurrency: 20
+    concurrency: 50
 })
 
