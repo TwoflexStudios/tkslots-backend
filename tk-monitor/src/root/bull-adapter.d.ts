@@ -1,0 +1,68 @@
+/// <reference types="ioredis" />
+import { Queue, Job, QueueProvider } from './queue';
+import type { JobId, JobStatusClean, JobCounts, JobLogs, QueueConfig, GlobalJobCompletionCb } from './queue';
+import { JobStatus } from './queue';
+import type { Queue as BullQueue, Job as BullJob } from 'bull';
+import type { Maybe } from './typings/utils';
+export declare class BullJobAdapter extends Job {
+    private _job;
+    private _queue;
+    constructor(_job: BullJob, _queue: Queue);
+    get rawJob(): BullJob;
+    get queue(): Queue;
+    get id(): JobId;
+    get name(): string;
+    get data(): any;
+    get returnvalue(): unknown;
+    get progress(): string;
+    get attemptsMade(): number;
+    get failedReason(): Maybe<string>;
+    get stacktrace(): string[];
+    get opts(): any;
+    get processedOn(): Maybe<number>;
+    get finishedOn(): Maybe<number>;
+    get timestamp(): Maybe<number>;
+    getState(): Promise<JobStatus>;
+    moveToCompleted(returnValue?: string): Promise<any>;
+    moveToFailed(reason: Error): Promise<any>;
+    promote(): Promise<void>;
+    discard(): Promise<void>;
+    update(data: any): Promise<void>;
+    retry(): Promise<void>;
+    remove(): Promise<void>;
+    log(row: string): Promise<void>;
+}
+export declare class BullAdapter extends Queue {
+    private _queue;
+    private _id;
+    private _globalJobCompletionCb?;
+    constructor(_queue: BullQueue, config?: QueueConfig);
+    get provider(): QueueProvider;
+    get client(): Promise<import("ioredis").Redis>;
+    get id(): string;
+    get name(): string;
+    get token(): string;
+    set onGlobalJobCompletion(callback: GlobalJobCompletionCb);
+    toKey(queueType: string): string;
+    count(): Promise<number>;
+    add(name: string, data: any, opts?: any): Promise<Job>;
+    pause(isLocal?: boolean, doNotWaitActive?: boolean): Promise<void>;
+    resume(isLocal?: boolean): Promise<void>;
+    clean(grace: number, status?: JobStatusClean, limit?: number): Promise<JobId[]>;
+    empty(): Promise<void>;
+    isPaused(): Promise<boolean>;
+    getJob(id: JobId): Promise<Maybe<Job>>;
+    jobFromJSON(json: any, jobId: JobId): Job;
+    getJobs(status: JobStatus, start?: number, end?: number, asc?: boolean): Promise<Job[]>;
+    getJobCounts(): Promise<JobCounts>;
+    getActiveCount(): Promise<number>;
+    getCompletedCount(): Promise<number>;
+    getFailedCount(): Promise<number>;
+    getDelayedCount(): Promise<number>;
+    getWaitingCount(): Promise<number>;
+    getPausedCount(): Promise<number>;
+    removeJobs(pattern: string): Promise<void>;
+    getJobLogs(jobId: JobId): Promise<JobLogs>;
+    close(doNotWaitJobs?: boolean): Promise<void>;
+    private normalizeJob;
+}
