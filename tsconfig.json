@@ -15,5 +15,10 @@
   "include": [
     "src"
   ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "tk-monitor-module"
+  ],
   "files":["./src/types/express.d.ts"]
 }
