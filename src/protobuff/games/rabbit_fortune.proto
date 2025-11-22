@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+package pb_game_100031;
+
+message cs_game_roll {
+  int64 betScore = 1;
+}
+
+message sc_game_roll {
+  int32 currentMode = 1;
+  int32 nextMode = 2;
+  int64 winScore = 3;
+  int32 winType = 4;
+  int64 userScore = 5;
+  int64 betScore = 6;
+  repeated int32 resultCells = 7;
+  repeated int32 resultLines = 8;
+  repeated int32 hitCells = 9;
+  int32 rotatestate = 10;
+  repeated int32 muti = 11;
+  repeated int32 mutiHit = 12;
+  int32 ratatetimes = 13;
+  int32 totalrotatetimes = 14;
+}
+
+message sc_game_info {
+  sc_game_roll gameinfo = 1;
+  int32 gameLine = 2;
+  int64 defaultBet = 3;
+}

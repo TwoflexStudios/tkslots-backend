@@ -1,7 +1,8 @@
 import mongoose, { Schema } from "mongoose";
 
 export enum GamesEnum {
-    BANDIDOS_BANG = "bandidos_bang"
+    BANDIDOS_BANG = "bandidos_bang",
+    RABBIT_FORTUNE = "rabbit_fortune"
 }
 
 export enum BucketTypeEnum {

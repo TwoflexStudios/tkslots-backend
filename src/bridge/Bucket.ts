@@ -11,9 +11,11 @@ import { toBRL } from "../helpers/toBRL";
 import Game, { GameEventEnum, GameRoll } from "./Game";
 import { Delay } from "../helpers/delay";
 import { PermissionsEnum } from "../schemas/users";
+import RabbitFortune from "./games/RabbitFortune";
 
 export const GameMapping = {
-    [GamesEnum.BANDIDOS_BANG]: BandidosBang
+    [GamesEnum.BANDIDOS_BANG]: BandidosBang,
+    [GamesEnum.RABBIT_FORTUNE]: RabbitFortune
 }
 
 class Bucket {
