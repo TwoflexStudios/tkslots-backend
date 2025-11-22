@@ -6,6 +6,7 @@ import GameHostRoutes from "./game-host";
 import ProxyRoutes from "./proxy";
 import BotsRoutes from "./bots";
 import BucketsRoutes from "./buckets";
+import UsersRoutes from "./users";
 
 const routes = Router();
 
@@ -16,5 +17,6 @@ routes.use("/game-host", GameHostRoutes)
 routes.use("/bots", BotsRoutes)
 routes.use("/proxy", ProxyRoutes)
 routes.use("/buckets", BucketsRoutes)
+routes.use("/users", UsersRoutes)
 
 export default routes;

@@ -4,8 +4,13 @@ import BowerModule from "../../../../services/code/Bower";
 import { CodeEventsEnum } from "../../../../globals/enums/CodeEventsEnum";
 
 export const onUseCodeGen = (socket: Socket, context: SocketContext) => {
-    socket.on("useCodeGen", async ({ type, service }: { type: "phone" | "email", service: string }) => {
+    socket.on("useCodeGen", async ({ type, service }: { type: "phone" | "email" | "domain-list" , service: string }) => {
         try {
+            
+            if(type === "domain-list"){
+                return []
+            }
+
             const bowerModule = new BowerModule();
 
             bowerModule.on(CodeEventsEnum.CODE_RECEIVED, (data) => {

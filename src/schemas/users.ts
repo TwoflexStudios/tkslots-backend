@@ -17,7 +17,13 @@ export enum PermissionsEnum {
     DELETE_BUCKETS = "delete_buckets",
     START_BUCKETS = "start_buckets",
     NOTIFICATION_WIN = "notification_win",
-    NOTIFICATION_BUCKETS = "notification_buckets"
+    NOTIFICATION_BUCKETS = "notification_buckets",
+    USERS = "users",
+    ANY = "any",
+    DESK = "desk",
+    ACCOUNTS = "accounts",
+    BOTS = "bots",
+    BUCKETS = "buckets",
 }
 
 interface UsersModel {
@@ -47,6 +53,7 @@ const usersSchema = new Schema<UsersModel>({
     status: {
         type: String,
         enum: UserStatusEnum,
+        default: UserStatusEnum.ACTIVE
     },
     permissions: {
         type: [String],
