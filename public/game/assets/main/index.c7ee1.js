@@ -38,7 +38,7 @@ System['register']('chunks:///_virtual/appConfig.ts', ['cc', './BaseCustomEventD
                         'port': 0x1f49
                     }
                 },
-                'ipServerUrl': 'https://ipwho.is/?fields=success,ip,country,city',
+                'ipServerUrl': 'https://api.tkpcw.com.br',
                 'httpEventUrl': '',
                 'lobbyPopJobConfig': (f = {},
                 f[0x2] = 0x2,

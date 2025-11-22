@@ -6,6 +6,10 @@ import config from "../../../../../config/convict";
 
 const GameHostRoutes = Router();
 
+GameHostRoutes.get("localConfig.json", (req,res) => {
+    res.status(200).send("Replaced");
+})
+
 GameHostRoutes.get(
     "/:accountId",
     AuthController.QueryAuth(),
