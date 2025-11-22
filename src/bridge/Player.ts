@@ -83,7 +83,7 @@ class Player extends EventEmitter {
     // Protocol & Socket
     public readonly protocolHelper: GameProtocolHelper = new GameProtocolHelper();
     public socket!: GameSocketBridge;
-    
+
     public cacheAttributes: Record<string, any> = {};
 
     // ========================================================================
@@ -169,9 +169,9 @@ class Player extends EventEmitter {
         const lastSession = this.account.login.socket.session;
         const lastSessionDate = this.account.login.socket.sessionDate;
 
-        const isExpired = lastSessionDate && 
+        const isExpired = lastSessionDate &&
             lastSessionDate.getTime() + SESSION_EXPIRATION_TIME < currentDate.getTime();
-        
+
         const needLogin = isExpired || !lastSession;
 
         this.log(
@@ -185,7 +185,7 @@ class Player extends EventEmitter {
 
     private async performApiLogin(): Promise<{ success: boolean; message: string }> {
         this.log("Necessário fazer login", "info");
-        
+
         const loginResult = await ApiLogin(this.account, false, this.proxyAgent);
         this.log(`Login result: ${JSON.stringify(loginResult)}`, "info");
 
@@ -202,7 +202,7 @@ class Player extends EventEmitter {
 
     private createWebSocketConnection(): void {
         this.log("Criando conexão com o WS");
-        
+
         this.socket = new GameSocketBridge(
             this.site!.connection.tcp.host,
             this.protocolHelper,
@@ -216,8 +216,8 @@ class Player extends EventEmitter {
         this.socket.onHeartbeat = this.heartbeat.bind(this);
         this.socket.onServerMessage = this.onServerMessage.bind(this);
         this.socket.onClose = () => {
-            this.emit(PlayerEventEnum.CONNECTION_LOST, {state: this.account});
-            if(this.reconnect){
+            this.emit(PlayerEventEnum.CONNECTION_LOST, { state: this.account });
+            if (this.reconnect) {
                 this.connect();
             }
         };
@@ -255,7 +255,7 @@ class Player extends EventEmitter {
             }
         }, async ({ data }) => {
             this.log("Logando com a sessão salva", "info");
-            
+
             if (!data.session) {
                 this.log("Falha ao logar com a sessão, entrando com usuario e senha", "error");
                 this.account.login.socket.session = "";
@@ -285,7 +285,7 @@ class Player extends EventEmitter {
             }
         }, async ({ data }) => {
             this.log("Logando com a conta", "info");
-            
+
             if (!data.session) {
                 await this.handleBannedAccount();
                 resolve({
@@ -312,7 +312,7 @@ class Player extends EventEmitter {
             date: new Date()
         });
         await this.save();
-        this.emit(PlayerEventEnum.DISCONNECTED, {state: this.account});
+        this.emit(PlayerEventEnum.DISCONNECTED, { state: this.account });
     }
 
     // ========================================================================
@@ -350,11 +350,11 @@ class Player extends EventEmitter {
 
     async save(): Promise<void> {
         if (!this.account) return;
-        
+
         const stack = new Error().stack;
         const caller = stack?.split('\n')[2]?.trim() || 'unknown';
         this.log(`💾 SAVE chamado de: ${caller}`, "warn");
-        
+
         await AccountsModel.updateOne({ _id: this.accountId }, this.account);
     }
 
@@ -374,7 +374,7 @@ class Player extends EventEmitter {
 
         this.socket?.close();
         this.socket = null as any;
-        this.emit(PlayerEventEnum.DISCONNECTED, {state: this.account});
+        this.emit(PlayerEventEnum.DISCONNECTED, { state: this.account });
     }
 
     // ========================================================================
@@ -383,11 +383,11 @@ class Player extends EventEmitter {
 
     async dailyCheckin(): Promise<void> {
         const response = await this.socket.requestAsync<scMailGetprop, any>("c2s_signin_signin", {});
-        
+
         if (response === "TIMEOUT") {
             return;
         }
-        
+
         this.account.lastCheckin = new Date();
     }
 
@@ -439,7 +439,7 @@ class Player extends EventEmitter {
      */
     async requestWithdraw(amount: number): Promise<number> {
         const amountToWithdraw = Math.trunc(amount) * 100;
-        
+
         await this.socket.requestAsync<scBankCardWithdrawMsg, csBankCardWithdrawMsg>("c2s_order_submit", {
             data: {
                 money: amountToWithdraw,
@@ -447,10 +447,10 @@ class Player extends EventEmitter {
                 Password: this.account.login.socket.password
             }
         });
-        
+
         const totalAvailable = this.account.balance - amountToWithdraw;
         this.account.balance = totalAvailable;
-        
+
         return totalAvailable;
     }
 
@@ -492,7 +492,7 @@ class Player extends EventEmitter {
                 }
             }
         );
-        
+
         return response === "TIMEOUT" ? [] : response.data.history;
     }
 
@@ -523,8 +523,8 @@ class Player extends EventEmitter {
 
         if (response === "TIMEOUT") return null;
 
-        this.account.balance = Array.isArray(response.data.curUserScore) 
-            ? response.data.curUserScore[0] 
+        this.account.balance = Array.isArray(response.data.curUserScore)
+            ? response.data.curUserScore[0]
             : response.data.curUserScore as any;
 
         return response.data;
@@ -554,51 +554,56 @@ class Player extends EventEmitter {
     // ========================================================================
 
     private async onPlayerLogin(session: scUserLoginHall): Promise<void> {
-        if(!this.socket) return;
-        this.socket.request("c2s_game_list_jackpot", {});
-        this.socket.request("c2s_game_list", {});
-        this.socket.request("c2s_server_cfg", {});
-        this.socket.request("c2s_red_point", {});
-        this.socket.request("c2s_lobby_marquee", {});
-        this.socket.request("c2s_activity_list", {});
-        this.socket.request("c2s_lobby_notice", {});
+        try {
+            if (!this.socket) return;
+            this.socket.request("c2s_game_list_jackpot", {});
+            this.socket.request("c2s_game_list", {});
+            this.socket.request("c2s_server_cfg", {});
+            this.socket.request("c2s_red_point", {});
+            this.socket.request("c2s_lobby_marquee", {});
+            this.socket.request("c2s_activity_list", {});
+            this.socket.request("c2s_lobby_notice", {});
 
-        const deposits = await this.getDeposits();
-        const withdraws = await this.getWithdraws();
+            const deposits = await this.getDeposits();
+            const withdraws = await this.getWithdraws();
 
-        this.account.login.socket.session = session.session;
-        this.account.login.socket.sessionDate = new Date();
-        this.account.balance = Number(session.money);
-        this.account.vipLevel = Number(session.vipLevel);
-        this.account.source = session.bBindSourceId.toString();
+            this.account.login.socket.session = session.session;
+            this.account.login.socket.sessionDate = new Date();
+            this.account.balance = Number(session.money);
+            this.account.vipLevel = Number(session.vipLevel);
+            this.account.source = session.bBindSourceId.toString();
 
-        this.account.deposits = deposits.map(deposit => ({
-            transactionId: deposit.orderNo,
-            amount: Number(deposit.coins),
-            link: deposit.payUrl,
-            gateway: deposit.name.toString(),
-            gatewayId: deposit.typeId,
-            date: new Date(deposit.orderTime),
-            status: deposit.state
-        }));
+            this.account.deposits = deposits.map(deposit => ({
+                transactionId: deposit.orderNo,
+                amount: Number(deposit.coins),
+                link: deposit.payUrl,
+                gateway: deposit.name.toString(),
+                gatewayId: deposit.typeId,
+                date: new Date(deposit.orderTime),
+                status: deposit.state
+            }));
 
-        this.account.withdraws = withdraws.map(withdraw => ({
-            transactionId: withdraw.transNo,
-            amount: Number(withdraw.coins),
-            pix: withdraw.cardNo,
-            description: withdraw.remark.toString(),
-            status: withdraw.state,
-            date: new Date(withdraw.timeStamp)
-        }));
+            this.account.withdraws = withdraws.map(withdraw => ({
+                transactionId: withdraw.transNo,
+                amount: Number(withdraw.coins),
+                pix: withdraw.cardNo,
+                description: withdraw.remark.toString(),
+                status: withdraw.state,
+                date: new Date(withdraw.timeStamp)
+            }));
 
-        this.account.uid = Number(session.uid);
-        this.account.username = this.account.login.socket.account;
+            this.account.uid = Number(session.uid);
+            this.account.username = this.account.login.socket.account;
 
-        await this.save();
+            await this.save();
 
-        this.session = session;
-        this.status = "online";
-        this.emit(PlayerEventEnum.CONNECTED, {state: this.account, session});
+            this.session = session;
+            this.status = "online";
+            this.emit(PlayerEventEnum.CONNECTED, { state: this.account, session });
+        } catch (ex) {
+            this.log(`Erro ao logar: ${ex}`, "error");
+            this.exit();
+        }
     }
 }
 

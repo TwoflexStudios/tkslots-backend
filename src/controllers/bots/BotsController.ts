@@ -10,11 +10,12 @@ interface CreateBotsDTO {
     quantity: number;
     needPhone: boolean;
     platform: PlatformEnum;
+    allowCheckin: boolean;
 }
 
 class BotsController {
     static createBots = (req: Request, res: Response) => {
-        const { siteId, quantity, needPhone, platform } = req.body;
+        const { siteId, quantity, needPhone, platform, allowCheckin } = req.body;
 
         const listenKey = crypto.randomUUID();
 
@@ -24,6 +25,7 @@ class BotsController {
                 listenKey,
                 account: {
                     mode: AccountLoginTypeEnum.GUEST,
+                    allowCheckin: allowCheckin,
                     needPhone: needPhone,
                     device: {
                         id: deviceId,

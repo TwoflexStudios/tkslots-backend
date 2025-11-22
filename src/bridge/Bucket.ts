@@ -41,7 +41,7 @@ class Bucket {
         if (!bucketData) {
             throw new Error("Bucket not found");
         }
-        
+
         useApplication().on(`${this.bucketId}:stop`, async () => {
             this.forceStop();
             logger.warn(`[${this.bucket.name}] Fechamento forçado`);
@@ -64,13 +64,19 @@ class Bucket {
         });
     }
 
-    async forceStop(){
+    async forceStop() {
         this.players.forEach(player => {
-            player.account.status = AccountStatusEnum.IDLE;
-            player.account.bucketId = null;
-            player.account.statusReason = "Fechamento forçado";
-            player.save();
-            player.exit();
+            try {
+                player.account.status = AccountStatusEnum.IDLE;
+                player.account.bucketId = null;
+                player.account.statusReason = "Fechamento forçado";
+                player.save();
+                player.exit();
+            } catch {
+                setTimeout(() => {
+                    try { player.exit(); } catch { }
+                }, 5000);
+            }
         });
         this.games.forEach(game => game.exit());
     }
@@ -109,16 +115,18 @@ class Bucket {
                     nextStartDate.setMonth(nextStartDate.getMonth() + 1);
                 },
                 hours: () => {
-                    const interval = Number(time.split(":")[0]);
-                    nextStartDate.setHours(nextStartDate.getHours() + interval);
+                    const [hours, minutes] = time.split(":");
+                    nextStartDate.setHours(nextStartDate.getHours() + Number(hours));
+                    nextStartDate.setMinutes(nextStartDate.getMinutes() + Number(minutes));
                 },
                 minutes: () => {
-                    const interval = Number(time.split(":")[0]) || 1;
-                    nextStartDate.setMinutes(nextStartDate.getMinutes() + interval);
+                    const [minutes, seconds] = time.split(":");
+                    nextStartDate.setMinutes(nextStartDate.getMinutes() + Number(minutes));
+                    nextStartDate.setSeconds(nextStartDate.getSeconds() + Number(seconds));
                 },
                 seconds: () => {
-                    const interval = Number(time.split(":")[0]) || 1;
-                    nextStartDate.setSeconds(nextStartDate.getSeconds() + interval);
+                    const [seconds] = time.split(":");
+                    nextStartDate.setSeconds(nextStartDate.getSeconds() + Number(seconds));
                 }
             };
 
@@ -191,6 +199,14 @@ class Bucket {
     }
 
     async onPlayerReady(player: Player) {
+        if (this.ended) {
+            player.account.status = AccountStatusEnum.IDLE;
+            player.account.bucketId = null;
+            player.account.statusReason = "Bucket não está mais em execução";
+            player.save();
+            player.exit();
+            return;
+        }
         if (this.bucket.type === BucketTypeEnum.EVENT) {
             player.on(PlayerEventEnum.DISCONNECTED, () => this.onPlayerExit(player));
             player.on(PlayerEventEnum.CONNECTION_LOST, () => this.onPlayerExit(player));
@@ -239,7 +255,7 @@ class Bucket {
                         bet: game.bet
                     }
                 });
-                
+
                 this.onPlayersChange();
             }
 
@@ -306,13 +322,13 @@ class Bucket {
                 this.onPlayersChange();
             }
 
-            try{
+            try {
                 await game.startGame();
-            }catch(ex){
-                try{
+            } catch (ex) {
+                try {
                     player.exit();
                     game.exit();
-                }catch{}
+                } catch { }
             }
         }
     }
@@ -338,7 +354,11 @@ class Bucket {
     }
 
     async executeEvent() {
-        const bots = await AccountsModel.find({ bucketId: this.bucketId, status: AccountStatusEnum.BUSY });
+        const bots = await AccountsModel.find({
+            bucketId: this.bucketId,
+            status: AccountStatusEnum.BUSY
+        });
+
         logger.info(`[${this.bucket.name}] Executando evento para ${bots.length} bots`);
         this.players = bots.map(bot => new Player(bot._id.toString()));
 
@@ -347,25 +367,41 @@ class Bucket {
             bots: this.players,
         });
 
+        const totalPlayers = this.players.length;
+        const totalTime = this.bucket.executionTime * 1000; //em ms
+        const delayPerPlayer = totalTime / totalPlayers; // ms por player
+
+        logger.info(`[${this.bucket.name}] Delay entre players: ${delayPerPlayer}ms`);
+
         for (const player of this.players) {
-            try{
+            try {
                 player.connect().then(() => this.onPlayerReady(player));
                 player.on(PlayerEventEnum.CONNECTED, () => this.onPlayerReady(player));
-            }catch(ex){
+            } catch (ex) {
                 this.players = this.players.filter(bot => bot?.account?._id?.toString() !== player.account._id.toString());
                 player.account.status = AccountStatusEnum.IDLE;
                 player.account.bucketId = null;
                 player.account.statusReason = `Falhou no bucket: ${this.bucket.name}`;
                 await player.save();
-                try{player.exit();}catch{}
+                try { player.exit(); } catch { }
                 this.onPlayersChange();
             }
-            await Delay(1)
+
+            logger.info(`[${this.bucket.name}] Próxima player em ${delayPerPlayer}ms`);
+
+            // 💡 Delay proporcional para caber tudo dentro do tempo de execução em caso do tipo de bucket ser game.
+            await Delay(this.bucket.type === BucketTypeEnum.EVENT ? 1 : delayPerPlayer / 1000);
         }
 
         this.bucket.statusReason = "Bots rodando";
         await this.bucket.save();
+
+        // Finaliza automaticamente quando o tempo de execução acabar 
+        if(this.bucket.type === BucketTypeEnum.GAME){
+            setTimeout(() => this.end(), totalTime + 20000); // Adiciona 20 segundos de buffer
+        }
     }
+
 }
 
 export default Bucket;

@@ -13,6 +13,7 @@ interface CreateBucketDTO {
     repeat: RepeatOptions;
     startAfterCreation: boolean;
     botBalance: number;
+    executionTime: number;
     startAt: Date;
 }
 
@@ -57,6 +58,7 @@ class BucketsController {
             repeat, 
             startAfterCreation,
             botBalance,
+            executionTime,
             startAt
         }: CreateBucketDTO = req.body as any;
 
@@ -68,6 +70,7 @@ class BucketsController {
             bucket,
             repeat,
             botBalance,
+            executionTime: (executionTime || 30 * 60),
             startAt
         });
 

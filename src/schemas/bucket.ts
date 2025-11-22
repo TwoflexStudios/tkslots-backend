@@ -50,6 +50,7 @@ export interface BucketSchema {
     site: mongoose.Types.ObjectId;
     bots: number;
     type: BucketTypeEnum;
+    executionTime: number;
     bucket: EventBucket | GameBucket;
     repeat: RepeatOptions;
     botBalance: number | null;
@@ -77,6 +78,11 @@ const BucketModel = new Schema<BucketSchema>({
     type: {
         type: String,
         required: true
+    },
+    executionTime: {
+        type: Number,
+        required: true,
+        default: 30 * 60,
     },
     bucket: {
         type: Object,
