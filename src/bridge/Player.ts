@@ -248,6 +248,8 @@ class Player extends EventEmitter {
         lastSession: string,
         resolve: (value: ConnectionResult) => void
     ): Promise<void> {
+        if(!this.socket) throw new Error("Socket não encontrado");
+        
         this.socket.request<scUserLoginHall, csUserSessionLogin>("c2s_session_verify", {
             data: {
                 deviceCode: this.account.login.device.id,
