@@ -13,6 +13,7 @@ import ApiLogin from "./api/account/login";
 import GameProtocolHelper from "./protocol/GameProtocolHelper";
 import GameSocketBridge from "./protocol/GameSocketBridge";
 import { EventEmitter } from "stream";
+import { scSiginResult } from "../types/protobuff/pb_lobby_signin";
 
 // ============================================================================
 // Constants
@@ -243,35 +244,6 @@ class Player extends EventEmitter {
         this.socket.init();
     }
 
-    async getBalance(){
-        const data = await this.socket.requestAsync<scUserLoginHall, csUserSessionLogin>("c2s_session_verify", {
-            data: {
-                deviceCode: this.account.login.device.id,
-                session: this.account.login.socket.session as any,
-                uid: this.account.uid as any
-            }
-        });
-        console.log({
-                deviceCode: this.account.login.device.id,
-                session: this.account.login.socket.session as any,
-                uid: this.account.uid as any
-            }, "Resultado GetBalance")
-
-        if(data === "TIMEOUT"){
-            return this.account.balance;
-        }
-
-        const {data: response} = data;
-
-        if (!response.session) {
-            return this.account.balance;
-        }
-
-        this.account.balance = response.money;
-
-        return response.money;
-    }
-
     private async loginWithSession(
         lastSession: string,
         resolve: (value: ConnectionResult) => void
@@ -401,8 +373,6 @@ class Player extends EventEmitter {
             }
         }
 
-        await this.getBalance();
-
         this.socket?.close();
         this.socket = null as any;
         this.emit(PlayerEventEnum.DISCONNECTED, { state: this.account });
@@ -413,13 +383,14 @@ class Player extends EventEmitter {
     // ========================================================================
 
     async dailyCheckin(): Promise<void> {
-        const response = await this.socket.requestAsync<scMailGetprop, any>("c2s_signin_signin", {});
+        const response = await this.socket.requestAsync<scSiginResult, any>("c2s_signin_signin", {});
 
         if (response === "TIMEOUT") {
             return;
         }
 
         this.account.lastCheckin = new Date();
+        this.account.balance = response.data.curCoin;
     }
 
     // ========================================================================
@@ -626,8 +597,6 @@ class Player extends EventEmitter {
 
             this.account.uid = Number(session.uid);
             this.account.username = this.account.login.socket.account;
-
-            await this.getBalance();
 
             await this.save();
 
