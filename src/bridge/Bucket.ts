@@ -83,6 +83,17 @@ class Bucket {
         });
         this.games.forEach(game => game.exit());
 
+        await AccountsModel.updateMany(
+            { bucketId: this.bucketId, status: AccountStatusEnum.BUSY },
+            {
+                $set: {
+                    status: AccountStatusEnum.IDLE,
+                    bucketId: null,
+                    statusReason: "Fechamento forçado"
+                }
+            }
+        );
+
         clearTimeout(this.exitTimeout);
     }
 
