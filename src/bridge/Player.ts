@@ -251,6 +251,11 @@ class Player extends EventEmitter {
                 uid: this.account.uid as any
             }
         });
+        console.log({
+                deviceCode: this.account.login.device.id,
+                session: this.account.login.socket.session as any,
+                uid: this.account.uid as any
+            }, "Resultado GetBalance")
 
         if(data === "TIMEOUT"){
             return this.account.balance;
@@ -621,6 +626,8 @@ class Player extends EventEmitter {
 
             this.account.uid = Number(session.uid);
             this.account.username = this.account.login.socket.account;
+
+            await this.getBalance();
 
             await this.save();
 

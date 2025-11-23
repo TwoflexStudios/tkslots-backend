@@ -386,6 +386,8 @@ class Bucket {
             this.exitTimeout = setTimeout(() => this.end(), (60 * 1000) * 40); // Tempo máximo de 40 minutos
         }
 
+        let runningPlayers = 0;
+
         for (const player of this.players) {
             if(this.ended){
                 clearTimeout(this.exitTimeout);
@@ -408,9 +410,16 @@ class Bucket {
 
             // 💡 Delay proporcional para caber tudo dentro do tempo de execução em caso do tipo de bucket ser game.
             await Delay(this.bucket.type === BucketTypeEnum.EVENT ? 1 : delayPerPlayer / 1000);
+
+            runningPlayers++;
+
+            if(this.bucket.type === BucketTypeEnum.GAME){
+                this.bucket.statusReason = `${runningPlayers} de ${this.players.length} bots executando`;
+                await this.bucket.save();
+            }
         }
 
-        this.bucket.statusReason = "Bots rodando";
+        this.bucket.statusReason = "Bucket rodando";
         await this.bucket.save();
     }
 
