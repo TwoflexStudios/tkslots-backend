@@ -24,6 +24,8 @@ class Bucket {
     public ended: boolean = false;
 
     private reservedBots: number = 0;
+    //@ts-ignore
+    private exitTimeout: NodeJS.Timeout;
 
     //@ts-ignore
     bucket: Document<unknown, {}, BucketSchema, {}, {}> & BucketSchema & {
@@ -77,8 +79,11 @@ class Bucket {
                     try { player.exit(); } catch { }
                 }, 5000);
             }
+
         });
         this.games.forEach(game => game.exit());
+
+        clearTimeout(this.exitTimeout);
     }
 
     emit(event: string, data: any) {
@@ -90,6 +95,7 @@ class Bucket {
 
     async end(reason = "Finalizado") {
         if (this.ended) return;
+        clearTimeout(this.exitTimeout);
         this.ended = true;
         this.bucket.status = BucketStatusEnum.ENDED;
         this.bucket.statusReason = reason;
@@ -373,7 +379,18 @@ class Bucket {
 
         logger.info(`[${this.bucket.name}] Delay entre players: ${delayPerPlayer}ms`);
 
+        // Finaliza automaticamente quando o tempo de execução acabar 
+        if(this.bucket.type === BucketTypeEnum.GAME){
+            this.exitTimeout = setTimeout(() => this.end(), totalTime + (60 * 1000) * 10); // Adiciona 10 minutos de buffer
+        }else{
+            this.exitTimeout = setTimeout(() => this.end(), (60 * 1000) * 40); // Tempo máximo de 40 minutos
+        }
+
         for (const player of this.players) {
+            if(this.ended){
+                clearTimeout(this.exitTimeout);
+                break;
+            }
             try {
                 player.connect().then(() => this.onPlayerReady(player));
                 player.on(PlayerEventEnum.CONNECTED, () => this.onPlayerReady(player));
@@ -395,13 +412,6 @@ class Bucket {
 
         this.bucket.statusReason = "Bots rodando";
         await this.bucket.save();
-
-        // Finaliza automaticamente quando o tempo de execução acabar 
-        if(this.bucket.type === BucketTypeEnum.GAME){
-            setTimeout(() => this.end(), totalTime + (60 * 1000) * 10); // Adiciona 10 minutos de buffer
-        }else{
-            setTimeout(() => this.end(), (60 * 1000) * 40); // Tempo máximo de 40 minutos
-        }
     }
 
 }
