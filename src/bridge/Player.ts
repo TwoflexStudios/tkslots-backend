@@ -141,7 +141,7 @@ class Player extends EventEmitter {
     }
 
     private async initializeProtocols(): Promise<void> {
-        this.log("Iniciando conexão", "info");
+        // this.log("Iniciando conexão", "info");
         await this.protocolHelper.loadFromFolder(PROTOBUFF_PATHS.MAIN);
         await this.protocolHelper.loadFromFolder(PROTOBUFF_PATHS.GAMES);
     }
@@ -187,7 +187,7 @@ class Player extends EventEmitter {
         this.log("Necessário fazer login", "info");
 
         const loginResult = await ApiLogin(this.account, false, this.proxyAgent);
-        this.log(`Login result: ${JSON.stringify(loginResult)}`, "info");
+        // this.log(`Login result: ${JSON.stringify(loginResult)}`, "info");
 
         if (!loginResult.status) {
             this.log(`Erro ao fazer login: ${loginResult.message}`, "error");
@@ -201,7 +201,7 @@ class Player extends EventEmitter {
     }
 
     private createWebSocketConnection(): void {
-        this.log("Criando conexão com o WS");
+        // this.log("Criando conexão com o WS");
 
         this.socket = new GameSocketBridge(
             this.site!.connection.tcp.host,
@@ -566,6 +566,7 @@ class Player extends EventEmitter {
 
             const deposits = await this.getDeposits();
             const withdraws = await this.getWithdraws();
+            await this.readEmails();
 
             this.account.login.socket.session = session.session;
             this.account.login.socket.sessionDate = new Date();

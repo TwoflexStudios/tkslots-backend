@@ -94,7 +94,7 @@ class Game<T> extends EventEmitter {
     }
 
     async loadRoom() {
-        this.log("Carregando jogo", "info");
+        // this.log("Carregando jogo", "info");
         const gameInfo = await this.player.socket.requestAsync<scGameroomList, csGameroomList>("c2s_game_room", { data: { gameId: this.gameId } });
 
         if (gameInfo === "TIMEOUT") return false;
@@ -118,11 +118,11 @@ class Game<T> extends EventEmitter {
     }
 
     private async initializeProtocols(): Promise<void> {
-        this.log("Iniciando conexão", "info");
+        // this.log("Iniciando conexão", "info");
     }
 
     private createWebSocketConnection(): void {
-        this.log("Criando conexão com o WS");
+        // this.log("Criando conexão com o WS");
         this.socket = new GameSocketBridge(
             this.roomInfo?.serverIp!,
             this.player.protocolHelper,

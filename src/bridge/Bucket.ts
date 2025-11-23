@@ -398,7 +398,9 @@ class Bucket {
 
         // Finaliza automaticamente quando o tempo de execução acabar 
         if(this.bucket.type === BucketTypeEnum.GAME){
-            setTimeout(() => this.end(), totalTime + 20000); // Adiciona 20 segundos de buffer
+            setTimeout(() => this.end(), totalTime + (60 * 1000) * 10); // Adiciona 10 minutos de buffer
+        }else{
+            setTimeout(() => this.end(), (60 * 1000) * 40); // Tempo máximo de 40 minutos
         }
     }
 
