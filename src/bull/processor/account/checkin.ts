@@ -24,6 +24,7 @@ const CheckinJob = async (job: Job<JobData>) => {
 
         if (connected.status) {
             await player.dailyCheckin();
+            await player.getBalance();
         }
 
         account = player.account as any;

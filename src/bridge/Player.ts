@@ -243,6 +243,30 @@ class Player extends EventEmitter {
         this.socket.init();
     }
 
+    async getBalance(){
+        const data = await this.socket.requestAsync<scUserLoginHall, csUserSessionLogin>("c2s_session_verify", {
+            data: {
+                deviceCode: this.account.login.device.id,
+                session: this.account.login.socket.session as any,
+                uid: this.account.uid as any
+            }
+        });
+
+        if(data === "TIMEOUT"){
+            return this.account.balance;
+        }
+
+        const {data: response} = data;
+
+        if (!response.session) {
+            return this.account.balance;
+        }
+
+        this.account.balance = response.money;
+
+        return response.money;
+    }
+
     private async loginWithSession(
         lastSession: string,
         resolve: (value: ConnectionResult) => void
@@ -371,6 +395,8 @@ class Player extends EventEmitter {
                 this.log(`Erro ao ler emails antes de sair: ${error}`, "error");
             }
         }
+
+        await this.getBalance();
 
         this.socket?.close();
         this.socket = null as any;
