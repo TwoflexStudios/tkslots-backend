@@ -22,7 +22,7 @@ BindCronQueue.add(
     {},
     {
         repeat: {
-            every: 5 * 60 * 1000 // 5 minutos
+            every: 1 * 60 * 1000 // 1 minuto
         },
         jobId: "fetch-pending-bind" // garante que só existe um
     }
