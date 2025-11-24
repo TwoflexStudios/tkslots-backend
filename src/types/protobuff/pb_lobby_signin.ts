@@ -9,24 +9,10 @@ import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
 
 export const protobufPackage = "pb_lobby_signin";
 
-export interface signinState {
-  coin: number;
-  curCoin: number;
-  state: number;
-  day: number;
-}
-
 export interface weekReward {
   coin: number;
   curCoin: number;
   state: number;
-}
-
-export interface scSigninList {
-  curday: number;
-  states: signinState[];
-  toneup: number;
-  vlevel: number;
 }
 
 export interface scSigninBase {
@@ -35,12 +21,6 @@ export interface scSigninBase {
   weekreward: weekReward[];
   toneup: number;
   vlevel: number;
-}
-
-export interface scSiginResult {
-  coin: number;
-  curCoin: number;
-  state: number;
 }
 
 export interface scSigninResultEx {
@@ -58,113 +38,55 @@ export interface scWeekReward {
   coin: number;
 }
 
-function createBasesigninState(): signinState {
-  return { coin: 0, curCoin: 0, state: 0, day: 0 };
+/**
+ * ------------------------------------------------------
+ * signin_state
+ * (Todos os campos coin, curCoin e state são obrigatórios no decode)
+ * ------------------------------------------------------
+ */
+export interface signinState {
+  /** obrigatório */
+  coin: number;
+  /** obrigatório */
+  curCoin: number;
+  /** obrigatório */
+  state: number;
+  /** opcional */
+  day: number;
 }
 
-export const signinState: MessageFns<signinState> = {
-  encode(message: signinState, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.coin !== 0) {
-      writer.uint32(8).int32(message.coin);
-    }
-    if (message.curCoin !== 0) {
-      writer.uint32(16).int32(message.curCoin);
-    }
-    if (message.state !== 0) {
-      writer.uint32(24).int32(message.state);
-    }
-    if (message.day !== 0) {
-      writer.uint32(32).int32(message.day);
-    }
-    return writer;
-  },
+/**
+ * ------------------------------------------------------
+ * sc_signin_list
+ * ------------------------------------------------------
+ */
+export interface scSigninList {
+  /** obrigatório */
+  curday: number;
+  /** lista de estados */
+  states: signinState[];
+  /** obrigatório */
+  toneup: number;
+  /** obrigatório */
+  vlevel: number;
+  /** opcional */
+  bonus: number;
+}
 
-  decode(input: BinaryReader | Uint8Array, length?: number): signinState {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBasesigninState();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1: {
-          if (tag !== 8) {
-            break;
-          }
-
-          message.coin = reader.int32();
-          continue;
-        }
-        case 2: {
-          if (tag !== 16) {
-            break;
-          }
-
-          message.curCoin = reader.int32();
-          continue;
-        }
-        case 3: {
-          if (tag !== 24) {
-            break;
-          }
-
-          message.state = reader.int32();
-          continue;
-        }
-        case 4: {
-          if (tag !== 32) {
-            break;
-          }
-
-          message.day = reader.int32();
-          continue;
-        }
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skip(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): signinState {
-    return {
-      coin: isSet(object.coin) ? globalThis.Number(object.coin) : 0,
-      curCoin: isSet(object.curCoin) ? globalThis.Number(object.curCoin) : 0,
-      state: isSet(object.state) ? globalThis.Number(object.state) : 0,
-      day: isSet(object.day) ? globalThis.Number(object.day) : 0,
-    };
-  },
-
-  toJSON(message: signinState): unknown {
-    const obj: any = {};
-    if (message.coin !== 0) {
-      obj.coin = Math.round(message.coin);
-    }
-    if (message.curCoin !== 0) {
-      obj.curCoin = Math.round(message.curCoin);
-    }
-    if (message.state !== 0) {
-      obj.state = Math.round(message.state);
-    }
-    if (message.day !== 0) {
-      obj.day = Math.round(message.day);
-    }
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<signinState>, I>>(base?: I): signinState {
-    return signinState.fromPartial(base ?? ({} as any));
-  },
-  fromPartial<I extends Exact<DeepPartial<signinState>, I>>(object: I): signinState {
-    const message = createBasesigninState();
-    message.coin = object.coin ?? 0;
-    message.curCoin = object.curCoin ?? 0;
-    message.state = object.state ?? 0;
-    message.day = object.day ?? 0;
-    return message;
-  },
-};
+/**
+ * ------------------------------------------------------
+ * sc_sigin_result
+ * ------------------------------------------------------
+ */
+export interface scSiginResult {
+  slist: scSigninList[];
+  /** obrigatório */
+  reward: number;
+  /** obrigatório */
+  curUserScore: number;
+  /** opcional */
+  bonus: number;
+}
 
 function createBaseweekReward(): weekReward {
   return { coin: 0, curCoin: 0, state: 0 };
@@ -254,114 +176,6 @@ export const weekReward: MessageFns<weekReward> = {
     message.coin = object.coin ?? 0;
     message.curCoin = object.curCoin ?? 0;
     message.state = object.state ?? 0;
-    return message;
-  },
-};
-
-function createBasescSigninList(): scSigninList {
-  return { curday: 0, states: [], toneup: 0, vlevel: 0 };
-}
-
-export const scSigninList: MessageFns<scSigninList> = {
-  encode(message: scSigninList, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.curday !== 0) {
-      writer.uint32(8).int32(message.curday);
-    }
-    for (const v of message.states) {
-      signinState.encode(v!, writer.uint32(18).fork()).join();
-    }
-    if (message.toneup !== 0) {
-      writer.uint32(24).int32(message.toneup);
-    }
-    if (message.vlevel !== 0) {
-      writer.uint32(32).int32(message.vlevel);
-    }
-    return writer;
-  },
-
-  decode(input: BinaryReader | Uint8Array, length?: number): scSigninList {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBasescSigninList();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1: {
-          if (tag !== 8) {
-            break;
-          }
-
-          message.curday = reader.int32();
-          continue;
-        }
-        case 2: {
-          if (tag !== 18) {
-            break;
-          }
-
-          message.states.push(signinState.decode(reader, reader.uint32()));
-          continue;
-        }
-        case 3: {
-          if (tag !== 24) {
-            break;
-          }
-
-          message.toneup = reader.int32();
-          continue;
-        }
-        case 4: {
-          if (tag !== 32) {
-            break;
-          }
-
-          message.vlevel = reader.int32();
-          continue;
-        }
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skip(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): scSigninList {
-    return {
-      curday: isSet(object.curday) ? globalThis.Number(object.curday) : 0,
-      states: globalThis.Array.isArray(object?.states) ? object.states.map((e: any) => signinState.fromJSON(e)) : [],
-      toneup: isSet(object.toneup) ? globalThis.Number(object.toneup) : 0,
-      vlevel: isSet(object.vlevel) ? globalThis.Number(object.vlevel) : 0,
-    };
-  },
-
-  toJSON(message: scSigninList): unknown {
-    const obj: any = {};
-    if (message.curday !== 0) {
-      obj.curday = Math.round(message.curday);
-    }
-    if (message.states?.length) {
-      obj.states = message.states.map((e) => signinState.toJSON(e));
-    }
-    if (message.toneup !== 0) {
-      obj.toneup = Math.round(message.toneup);
-    }
-    if (message.vlevel !== 0) {
-      obj.vlevel = Math.round(message.vlevel);
-    }
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<scSigninList>, I>>(base?: I): scSigninList {
-    return scSigninList.fromPartial(base ?? ({} as any));
-  },
-  fromPartial<I extends Exact<DeepPartial<scSigninList>, I>>(object: I): scSigninList {
-    const message = createBasescSigninList();
-    message.curday = object.curday ?? 0;
-    message.states = object.states?.map((e) => signinState.fromPartial(e)) || [];
-    message.toneup = object.toneup ?? 0;
-    message.vlevel = object.vlevel ?? 0;
     return message;
   },
 };
@@ -488,98 +302,6 @@ export const scSigninBase: MessageFns<scSigninBase> = {
     message.weekreward = object.weekreward?.map((e) => weekReward.fromPartial(e)) || [];
     message.toneup = object.toneup ?? 0;
     message.vlevel = object.vlevel ?? 0;
-    return message;
-  },
-};
-
-function createBasescSiginResult(): scSiginResult {
-  return { coin: 0, curCoin: 0, state: 0 };
-}
-
-export const scSiginResult: MessageFns<scSiginResult> = {
-  encode(message: scSiginResult, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.coin !== 0) {
-      writer.uint32(8).int32(message.coin);
-    }
-    if (message.curCoin !== 0) {
-      writer.uint32(16).int32(message.curCoin);
-    }
-    if (message.state !== 0) {
-      writer.uint32(24).int32(message.state);
-    }
-    return writer;
-  },
-
-  decode(input: BinaryReader | Uint8Array, length?: number): scSiginResult {
-    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
-    const end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBasescSiginResult();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1: {
-          if (tag !== 8) {
-            break;
-          }
-
-          message.coin = reader.int32();
-          continue;
-        }
-        case 2: {
-          if (tag !== 16) {
-            break;
-          }
-
-          message.curCoin = reader.int32();
-          continue;
-        }
-        case 3: {
-          if (tag !== 24) {
-            break;
-          }
-
-          message.state = reader.int32();
-          continue;
-        }
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skip(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): scSiginResult {
-    return {
-      coin: isSet(object.coin) ? globalThis.Number(object.coin) : 0,
-      curCoin: isSet(object.curCoin) ? globalThis.Number(object.curCoin) : 0,
-      state: isSet(object.state) ? globalThis.Number(object.state) : 0,
-    };
-  },
-
-  toJSON(message: scSiginResult): unknown {
-    const obj: any = {};
-    if (message.coin !== 0) {
-      obj.coin = Math.round(message.coin);
-    }
-    if (message.curCoin !== 0) {
-      obj.curCoin = Math.round(message.curCoin);
-    }
-    if (message.state !== 0) {
-      obj.state = Math.round(message.state);
-    }
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<scSiginResult>, I>>(base?: I): scSiginResult {
-    return scSiginResult.fromPartial(base ?? ({} as any));
-  },
-  fromPartial<I extends Exact<DeepPartial<scSiginResult>, I>>(object: I): scSiginResult {
-    const message = createBasescSiginResult();
-    message.coin = object.coin ?? 0;
-    message.curCoin = object.curCoin ?? 0;
-    message.state = object.state ?? 0;
     return message;
   },
 };
@@ -808,6 +530,346 @@ export const scWeekReward: MessageFns<scWeekReward> = {
   },
 };
 
+function createBasesigninState(): signinState {
+  return { coin: 0, curCoin: 0, state: 0, day: 0 };
+}
+
+export const signinState: MessageFns<signinState> = {
+  encode(message: signinState, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.coin !== 0) {
+      writer.uint32(8).int32(message.coin);
+    }
+    if (message.curCoin !== 0) {
+      writer.uint32(16).int32(message.curCoin);
+    }
+    if (message.state !== 0) {
+      writer.uint32(24).int32(message.state);
+    }
+    if (message.day !== 0) {
+      writer.uint32(32).int32(message.day);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): signinState {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBasesigninState();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.coin = reader.int32();
+          continue;
+        }
+        case 2: {
+          if (tag !== 16) {
+            break;
+          }
+
+          message.curCoin = reader.int32();
+          continue;
+        }
+        case 3: {
+          if (tag !== 24) {
+            break;
+          }
+
+          message.state = reader.int32();
+          continue;
+        }
+        case 4: {
+          if (tag !== 32) {
+            break;
+          }
+
+          message.day = reader.int32();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): signinState {
+    return {
+      coin: isSet(object.coin) ? globalThis.Number(object.coin) : 0,
+      curCoin: isSet(object.curCoin) ? globalThis.Number(object.curCoin) : 0,
+      state: isSet(object.state) ? globalThis.Number(object.state) : 0,
+      day: isSet(object.day) ? globalThis.Number(object.day) : 0,
+    };
+  },
+
+  toJSON(message: signinState): unknown {
+    const obj: any = {};
+    if (message.coin !== 0) {
+      obj.coin = Math.round(message.coin);
+    }
+    if (message.curCoin !== 0) {
+      obj.curCoin = Math.round(message.curCoin);
+    }
+    if (message.state !== 0) {
+      obj.state = Math.round(message.state);
+    }
+    if (message.day !== 0) {
+      obj.day = Math.round(message.day);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<signinState>, I>>(base?: I): signinState {
+    return signinState.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<signinState>, I>>(object: I): signinState {
+    const message = createBasesigninState();
+    message.coin = object.coin ?? 0;
+    message.curCoin = object.curCoin ?? 0;
+    message.state = object.state ?? 0;
+    message.day = object.day ?? 0;
+    return message;
+  },
+};
+
+function createBasescSigninList(): scSigninList {
+  return { curday: 0, states: [], toneup: 0, vlevel: 0, bonus: 0 };
+}
+
+export const scSigninList: MessageFns<scSigninList> = {
+  encode(message: scSigninList, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    if (message.curday !== 0) {
+      writer.uint32(8).int32(message.curday);
+    }
+    for (const v of message.states) {
+      signinState.encode(v!, writer.uint32(18).fork()).join();
+    }
+    if (message.toneup !== 0) {
+      writer.uint32(24).int32(message.toneup);
+    }
+    if (message.vlevel !== 0) {
+      writer.uint32(32).int32(message.vlevel);
+    }
+    if (message.bonus !== 0) {
+      writer.uint32(40).int32(message.bonus);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): scSigninList {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBasescSigninList();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 8) {
+            break;
+          }
+
+          message.curday = reader.int32();
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.states.push(signinState.decode(reader, reader.uint32()));
+          continue;
+        }
+        case 3: {
+          if (tag !== 24) {
+            break;
+          }
+
+          message.toneup = reader.int32();
+          continue;
+        }
+        case 4: {
+          if (tag !== 32) {
+            break;
+          }
+
+          message.vlevel = reader.int32();
+          continue;
+        }
+        case 5: {
+          if (tag !== 40) {
+            break;
+          }
+
+          message.bonus = reader.int32();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): scSigninList {
+    return {
+      curday: isSet(object.curday) ? globalThis.Number(object.curday) : 0,
+      states: globalThis.Array.isArray(object?.states) ? object.states.map((e: any) => signinState.fromJSON(e)) : [],
+      toneup: isSet(object.toneup) ? globalThis.Number(object.toneup) : 0,
+      vlevel: isSet(object.vlevel) ? globalThis.Number(object.vlevel) : 0,
+      bonus: isSet(object.bonus) ? globalThis.Number(object.bonus) : 0,
+    };
+  },
+
+  toJSON(message: scSigninList): unknown {
+    const obj: any = {};
+    if (message.curday !== 0) {
+      obj.curday = Math.round(message.curday);
+    }
+    if (message.states?.length) {
+      obj.states = message.states.map((e) => signinState.toJSON(e));
+    }
+    if (message.toneup !== 0) {
+      obj.toneup = Math.round(message.toneup);
+    }
+    if (message.vlevel !== 0) {
+      obj.vlevel = Math.round(message.vlevel);
+    }
+    if (message.bonus !== 0) {
+      obj.bonus = Math.round(message.bonus);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<scSigninList>, I>>(base?: I): scSigninList {
+    return scSigninList.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<scSigninList>, I>>(object: I): scSigninList {
+    const message = createBasescSigninList();
+    message.curday = object.curday ?? 0;
+    message.states = object.states?.map((e) => signinState.fromPartial(e)) || [];
+    message.toneup = object.toneup ?? 0;
+    message.vlevel = object.vlevel ?? 0;
+    message.bonus = object.bonus ?? 0;
+    return message;
+  },
+};
+
+function createBasescSiginResult(): scSiginResult {
+  return { slist: [], reward: 0, curUserScore: 0, bonus: 0 };
+}
+
+export const scSiginResult: MessageFns<scSiginResult> = {
+  encode(message: scSiginResult, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    for (const v of message.slist) {
+      scSigninList.encode(v!, writer.uint32(10).fork()).join();
+    }
+    if (message.reward !== 0) {
+      writer.uint32(16).int32(message.reward);
+    }
+    if (message.curUserScore !== 0) {
+      writer.uint32(24).int64(message.curUserScore);
+    }
+    if (message.bonus !== 0) {
+      writer.uint32(32).int32(message.bonus);
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): scSiginResult {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBasescSiginResult();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.slist.push(scSigninList.decode(reader, reader.uint32()));
+          continue;
+        }
+        case 2: {
+          if (tag !== 16) {
+            break;
+          }
+
+          message.reward = reader.int32();
+          continue;
+        }
+        case 3: {
+          if (tag !== 24) {
+            break;
+          }
+
+          message.curUserScore = longToNumber(reader.int64());
+          continue;
+        }
+        case 4: {
+          if (tag !== 32) {
+            break;
+          }
+
+          message.bonus = reader.int32();
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): scSiginResult {
+    return {
+      slist: globalThis.Array.isArray(object?.slist) ? object.slist.map((e: any) => scSigninList.fromJSON(e)) : [],
+      reward: isSet(object.reward) ? globalThis.Number(object.reward) : 0,
+      curUserScore: isSet(object.curUserScore) ? globalThis.Number(object.curUserScore) : 0,
+      bonus: isSet(object.bonus) ? globalThis.Number(object.bonus) : 0,
+    };
+  },
+
+  toJSON(message: scSiginResult): unknown {
+    const obj: any = {};
+    if (message.slist?.length) {
+      obj.slist = message.slist.map((e) => scSigninList.toJSON(e));
+    }
+    if (message.reward !== 0) {
+      obj.reward = Math.round(message.reward);
+    }
+    if (message.curUserScore !== 0) {
+      obj.curUserScore = Math.round(message.curUserScore);
+    }
+    if (message.bonus !== 0) {
+      obj.bonus = Math.round(message.bonus);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<scSiginResult>, I>>(base?: I): scSiginResult {
+    return scSiginResult.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<scSiginResult>, I>>(object: I): scSiginResult {
+    const message = createBasescSiginResult();
+    message.slist = object.slist?.map((e) => scSigninList.fromPartial(e)) || [];
+    message.reward = object.reward ?? 0;
+    message.curUserScore = object.curUserScore ?? 0;
+    message.bonus = object.bonus ?? 0;
+    return message;
+  },
+};
+
 type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 
 export type DeepPartial<T> = T extends Builtin ? T
@@ -819,6 +881,17 @@ export type DeepPartial<T> = T extends Builtin ? T
 type KeysOfUnion<T> = T extends T ? keyof T : never;
 export type Exact<P, I extends P> = P extends Builtin ? P
   : P & { [K in keyof P]: Exact<P[K], I[K]> } & { [K in Exclude<keyof I, KeysOfUnion<P>>]: never };
+
+function longToNumber(int64: { toString(): string }): number {
+  const num = globalThis.Number(int64.toString());
+  if (num > globalThis.Number.MAX_SAFE_INTEGER) {
+    throw new globalThis.Error("Value is larger than Number.MAX_SAFE_INTEGER");
+  }
+  if (num < globalThis.Number.MIN_SAFE_INTEGER) {
+    throw new globalThis.Error("Value is smaller than Number.MIN_SAFE_INTEGER");
+  }
+  return num;
+}
 
 function isSet(value: any): boolean {
   return value !== null && value !== undefined;

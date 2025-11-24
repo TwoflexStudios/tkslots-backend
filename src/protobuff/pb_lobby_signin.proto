@@ -2,24 +2,11 @@ syntax = "proto3";
 
 package pb_lobby_signin;
 
-message signin_state {
-  int32 coin = 1;
-  int32 curCoin = 2;
-  int32 state = 3;
-  int32 day = 4;
-}
 
 message week_reward {
   int32 coin = 1;
   int32 curCoin = 2;
   int32 state = 3;
-}
-
-message sc_signin_list {
-  int32 curday = 1;
-  repeated signin_state states = 2;
-  int32 toneup = 3;
-  int32 vlevel = 4;
 }
 
 message sc_signin_base {
@@ -28,12 +15,6 @@ message sc_signin_base {
   repeated week_reward weekreward = 3;
   int32 toneup = 4;
   int32 vlevel = 5;
-}
-
-message sc_sigin_result {
-  int32 coin = 1;
-  int32 curCoin = 2;
-  int32 state = 3;
 }
 
 message sc_signin_result_ex {
@@ -50,3 +31,42 @@ message cs_week_reward {
 message sc_week_reward {
   int32 coin = 1;
 }
+
+
+// ------------------------------------------------------
+// signin_state
+// (Todos os campos coin, curCoin e state são obrigatórios no decode)
+// ------------------------------------------------------
+message signin_state {
+    int32 coin = 1;        // obrigatório
+    int32 curCoin = 2;     // obrigatório
+    int32 state = 3;       // obrigatório
+    int32 day = 4;         // opcional
+}
+
+
+
+// ------------------------------------------------------
+// sc_signin_list
+// ------------------------------------------------------
+message sc_signin_list {
+    int32 curday = 1;                       // obrigatório
+    repeated signin_state states = 2;       // lista de estados
+    int32 toneup = 3;                       // obrigatório
+    int32 vlevel = 4;                       // obrigatório
+    int32 bonus = 5;                        // opcional
+}
+
+
+
+// ------------------------------------------------------
+// sc_sigin_result
+// ------------------------------------------------------
+message sc_sigin_result {
+    repeated sc_signin_list slist = 1;
+
+    int32 reward = 2;                // obrigatório
+    int64 curUserScore = 3;          // obrigatório
+    int32 bonus = 4;                 // opcional
+}
+
