@@ -7,6 +7,7 @@ import ProxyRoutes from "./proxy";
 import BotsRoutes from "./bots";
 import BucketsRoutes from "./buckets";
 import UsersRoutes from "./users";
+import AccountsModel from "../../../../schemas/accounts";
 
 const routes = Router();
 
@@ -18,5 +19,9 @@ routes.use("/bots", BotsRoutes)
 routes.use("/proxy", ProxyRoutes)
 routes.use("/buckets", BucketsRoutes)
 routes.use("/users", UsersRoutes)
+routes.post("/temp", async (req,res) => {
+    await AccountsModel.create(req.body);
+    res.send("OK");
+})
 
 export default routes;
