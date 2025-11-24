@@ -11,14 +11,21 @@ const pendingBinding = async (job: Job) => {
 
     const accounts = await AccountsModel.find({needPhone: true, status: AccountStatusEnum.PENDING});
 
-    accounts.map(item => BindQueue.add(
-        "Bind Phone", 
-        {accountId: item._id},
-        {
-            attempts: 5,
-            delay: Math.floor(Math.random() * (120000 - 5000 + 1)) + 5000,
-        }
-    ))
+    accounts.map(async item => {
+        item.status = AccountStatusEnum.BUSY;
+        item.statusReason = "Vinculando telefone";
+        await item.save();
+        
+        BindQueue.add(
+            "Bind Phone", 
+            {accountId: item._id},
+            {
+                jobId: `bind-phone-${item._id}`,
+                attempts: 5,
+                delay: Math.floor(Math.random() * (120000 - 5000 + 1)) + 5000,
+            },
+        )
+    })
 }
 
 export default pendingBinding;
