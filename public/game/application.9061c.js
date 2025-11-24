@@ -46,7 +46,7 @@ System['register']([], function(a, b) {
                 function k() {
                     f(this, k),
                     this['settingsPath'] = '/game/src/settings.46aa2.json',
-                    this['showFPS'] = true; //☠️ Force FPS
+                    this['showFPS'] = false; //☠️ Force FPS
                 }
                 return h(k, [{
                     'key': 'init',
