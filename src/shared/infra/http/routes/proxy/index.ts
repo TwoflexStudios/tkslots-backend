@@ -44,6 +44,8 @@ ProxyRoutes.all('{/:agent}', async (req, res) => {
         delete headers.connection;
         delete headers['content-length'];
 
+        const tempProxyAgent = crypto.randomUUID();
+
         const response = await axios({
             url: target,
             method: req.method,
@@ -51,8 +53,8 @@ ProxyRoutes.all('{/:agent}', async (req, res) => {
             data: req.body, 
             timeout: 20000,
             responseType: 'stream',
-            ...(agent && { httpAgent: getProxyAgent(agent || crypto.randomUUID()) }),
-            ...(agent && { httpsAgent: getProxyAgent(agent || crypto.randomUUID()) }),
+            ...(agent && { httpAgent: getProxyAgent(tempProxyAgent) }),
+            ...(agent && { httpsAgent: getProxyAgent(tempProxyAgent) }),
             validateStatus: () => true
         });
 
