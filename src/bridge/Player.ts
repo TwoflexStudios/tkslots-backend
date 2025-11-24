@@ -392,7 +392,7 @@ class Player extends EventEmitter {
         }
 
         this.account.lastCheckin = new Date();
-        this.account.balance = response.data.curUserScore;
+        this.account.balance = response.data.curUserScore || this.account.balance;
     }
 
     // ========================================================================

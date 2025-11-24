@@ -2,12 +2,12 @@ import { Queue } from "bullmq";
 import { redisClient } from "../config/redis";
 
 export enum QueuesEnum {
-    FETCH_PENDING_BIND = "Validar contas pendentes de telefone",
-    ACCOUNT_BIND_PHONE = "Vincular telefone",
-    FETCH_PENDING_CHECKIN = "Validar contas pendentes de checkin",
-    ACCOUNT_CHECKIN = "Fazer checkin",
-    RUN_SCHEDULED_BUCKETS = "Iniciar buckets agendados",
-    ADD_BOT = "Adicionar bots",
+    FETCH_PENDING_BIND = "Validar contas pendentes de telefone (cron)",
+    ACCOUNT_BIND_PHONE = "Vincular telefone (job)",
+    FETCH_PENDING_CHECKIN = "Validar contas pendentes de checkin (cron)",
+    ACCOUNT_CHECKIN = "Fazer checkin (job)",
+    RUN_SCHEDULED_BUCKETS = "Iniciar buckets agendados (cron)",
+    ADD_BOT = "Adicionar bots (job)",
 }
 
 export const BindCronQueue = new Queue(QueuesEnum.FETCH_PENDING_BIND, {connection: redisClient});
