@@ -74,7 +74,7 @@ class Player extends EventEmitter {
     public reconnect: boolean = false;
 
     // Auto Logout
-    public autoLogoutAt: Date | null = null;
+    private autoLogoutAt: Date | null = null;
     public readAndGetAllEmailBeforeExit: boolean = false;
 
     // Proxy
@@ -164,6 +164,7 @@ class Player extends EventEmitter {
 
         return { success: true, message: "OK" };
     }
+    
 
     private checkIfNeedsLogin(): boolean {
         const currentDate = new Date();
@@ -332,19 +333,7 @@ class Player extends EventEmitter {
     }
 
     async heartbeat(): Promise<void> {
-        if (!this.autoLogoutAt) return;
-
-        const [hour, minute] = formatDate(this.autoLogoutAt, "HH:mm").split(":");
-        const endDate = new Date();
-        const currentDate = new Date();
-
-        endDate.setHours(Number(hour));
-        endDate.setMinutes(Number(minute));
-
-        if (endDate.getTime() < currentDate.getTime()) {
-            this.log("Logout automático");
-            await this.exit();
-        }
+        
     }
 
     // ========================================================================
@@ -364,6 +353,22 @@ class Player extends EventEmitter {
     async setAutoLogoutAt(date: Date): Promise<void> {
         this.log(`Setando logout automático para ${format(date, "HH:mm")}`);
         this.autoLogoutAt = date;
+
+        setInterval(async () => {
+            if (!this.autoLogoutAt) return;
+
+            const [hour, minute] = formatDate(this.autoLogoutAt, "HH:mm").split(":");
+            const endDate = new Date();
+            const currentDate = new Date();
+
+            endDate.setHours(Number(hour));
+            endDate.setMinutes(Number(minute));
+
+            if (endDate.getTime() < currentDate.getTime()) {
+                this.log("Logout automático");
+                await this.exit();
+            }
+        }, 1000)
     }
 
     async exit(): Promise<void> {
