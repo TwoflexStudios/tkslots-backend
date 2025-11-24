@@ -51,8 +51,8 @@ ProxyRoutes.all('{/:agent}', async (req, res) => {
             data: req.body, 
             timeout: 20000,
             responseType: 'stream',
-            ...(agent && { httpAgent: getProxyAgent(agent) }),
-            ...(agent && { httpsAgent: getProxyAgent(agent) }),
+            ...(agent && { httpAgent: getProxyAgent(agent || crypto.randomUUID()) }),
+            ...(agent && { httpsAgent: getProxyAgent(agent || crypto.randomUUID()) }),
             validateStatus: () => true
         });
 
