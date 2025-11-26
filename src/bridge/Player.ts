@@ -87,6 +87,7 @@ class Player extends EventEmitter {
 
     public cacheAttributes: Record<string, any> = {};
 
+    private autoLogoutInterval: NodeJS.Timeout | null = null;
     // ========================================================================
     // Constructor
     // ========================================================================
@@ -354,7 +355,7 @@ class Player extends EventEmitter {
         this.log(`Setando logout automático para ${format(date, "HH:mm")}`);
         this.autoLogoutAt = date;
 
-        setInterval(async () => {
+        this.autoLogoutInterval = setInterval(async () => {
             if (!this.autoLogoutAt) return;
 
             const [hour, minute] = formatDate(this.autoLogoutAt, "HH:mm").split(":");
@@ -367,6 +368,7 @@ class Player extends EventEmitter {
             if (endDate.getTime() < currentDate.getTime()) {
                 this.log("Logout automático");
                 await this.exit();
+                clearInterval(this.autoLogoutInterval!);
             }
         }, 1000)
     }
