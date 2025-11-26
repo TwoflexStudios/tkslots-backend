@@ -367,13 +367,15 @@ class Player extends EventEmitter {
 
             if (endDate.getTime() < currentDate.getTime()) {
                 this.log("Logout automático");
-                await this.exit();
                 clearInterval(this.autoLogoutInterval!);
+                await this.exit();
             }
         }, 1000)
     }
 
     async exit(): Promise<void> {
+        if(!this.socket) return;
+
         if (this.readAndGetAllEmailBeforeExit) {
             try {
                 await this.readEmails();
