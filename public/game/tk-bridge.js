@@ -4363,7 +4363,7 @@ window.getGameList = () => [
         }
     },
     {
-        "gameId": "100040",
+        "gameId": "100003",
         "gameName": "",
         "sort": 0,
         "kindId": 1,
