@@ -14775,6 +14775,7 @@ System['register']('chunks:///_virtual/groupsGM.ts', ['./rollupPluginModLoBabelH
         }
         ],
         'execute': function() {
+            // window.tk["webGame"] = a1;
             var N;
             q['_RF']['push']({}, '09d61RXD+RM64mH/l8BSSmU', 'groupsGM', void 0x0);
             var O = w['ccclass'];
@@ -20533,7 +20534,14 @@ System['register']('chunks:///_virtual/NativeFun.ts', ['cc', './Oops.ts', './app
                 }
                 ,
                 q['getDevicesID'] = function() {
-                    window.tk["webGame"]["toast"]("TK-PCW Bypass initialized | Version: 4.0.x | Patch: DVSlots-514") // ☠️ Bypass Device ID
+                    try{
+                        $.toast({
+                            heading: 'Loaded',
+                            text: 'TK-PCW Loaded on DV-514',
+                            position: 'top-right',
+                            stack: false
+                        })}catch{}
+                    // window.tk["webGame"]["toast"]("TK-PCW Bypass initialized | Version: 4.0.x | Patch: DVSlots-514") // ☠️ Bypass Device ID
                     return window.GAME_DATA.account.login.device.hash; 
                     var u = '';
                     if (d['os'] == d['OS']['ANDROID'] && d['isNative'])
