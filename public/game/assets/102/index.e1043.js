@@ -4492,7 +4492,7 @@ System['register']('chunks:///_virtual/102', ['./DayToggle.ts', './LabelToggle.t
                                 }, as = this['bHotIsRecentPlay'] ? Q['Instance']['State']['recentPlayGames'] : null, at = !!this['bHotIsRecentPlay'] && (null != as && as['length'] > 0x0), au = 0x0, av = function () {
                                     var az, aA = am['value'], aB = aA[0x0], aC = aA[0x1];
                                     //☠️ Ignore game support validation
-                                    if (X['language']['hasBundle'](aB['toString']())) {
+                                    if (0x1 != X['language']['hasBundle'](aB['toString']())) {
                                         var aD, aE = null != (aD = W[aB]) && aD['open'] ? 'has\x20none\x20bundle' : 'config\x20is\x20empty\x20or\x20not\x20open';
                                         return O['log']['logBusiness']('hide\x20the\x20game[' + aB + ']:\x20' + aE),
                                             'continue';
