@@ -41,6 +41,12 @@ function loadGames(startId, endId, options = {}) {
 // Main game list function
 window.getGameList = () => {
     const allGames = [
+        // 1 series games (1-100)
+        ...loadGames(1, 100),
+        // 1000 series games (1000-1010)
+        ...loadGames(1000, 1010),
+        // 10000 series games (10000-10010)
+        ...loadGames(10000, 10010),
         // 100000 series games (100000-100100)
         ...loadGames(100000, 100100),
         // 200000 series games (200000-200100)
@@ -59,6 +65,28 @@ window.getGameList = () => {
         ...loadGames(800000, 800100),
         // 900000 series games (900000-900100)
         ...loadGames(900000, 900100),
+        // 100000 series games (100000-100100)
+        ...loadGames(100000, 100100),
+        // 110000 series games (110000-110100)
+        ...loadGames(110000, 110100),
+        // 120000 series games (120000-120100)
+        ...loadGames(120000, 120100),
+        // 130000 series games (130000-130100)
+        ...loadGames(130000, 130100),
+        // 140000 series games (140000-140100)
+        ...loadGames(140000, 140100),
+        // 150000 series games (150000-150100)
+        ...loadGames(150000, 150100),
+        // 160000 series games (160000-160100)
+        ...loadGames(160000, 160100),
+        // 170000 series games (170000-170100)
+        ...loadGames(170000, 170100),
+        // 180000 series games (180000-180100)
+        ...loadGames(180000, 180100),
+        // 190000 series games (190000-190100)
+        ...loadGames(190000, 190100),
+        // 200000 series games (200000-200100)
+        ...loadGames(200000, 200100),
     ];
     
     return allGames;
