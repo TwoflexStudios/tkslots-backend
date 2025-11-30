@@ -4228,7 +4228,7 @@ window.getGameList = () => [
         }
     },
     {
-        "gameId": "100039",
+        "gameId": "100015",
         "gameName": "",
         "sort": 0,
         "kindId": 1,
@@ -4243,7 +4243,7 @@ window.getGameList = () => [
         }
     },
     {
-        "gameId": "100039",
+        "gameId": "100014",
         "gameName": "",
         "sort": 0,
         "kindId": 1,
@@ -4258,7 +4258,7 @@ window.getGameList = () => [
         }
     },
     {
-        "gameId": "100039",
+        "gameId": "100013",
         "gameName": "",
         "sort": 0,
         "kindId": 1,
@@ -4273,7 +4273,7 @@ window.getGameList = () => [
         }
     },
     {
-        "gameId": "100039",
+        "gameId": "100012",
         "gameName": "",
         "sort": 0,
         "kindId": 1,
@@ -4288,7 +4288,7 @@ window.getGameList = () => [
         }
     },
     {
-        "gameId": "100039",
+        "gameId": "100011",
         "gameName": "",
         "sort": 0,
         "kindId": 1,
@@ -4303,7 +4303,7 @@ window.getGameList = () => [
         }
     },
     {
-        "gameId": "100039",
+        "gameId": "100010",
         "gameName": "",
         "sort": 0,
         "kindId": 1,
@@ -4318,7 +4318,7 @@ window.getGameList = () => [
         }
     },
     {
-        "gameId": "100039",
+        "gameId": "100009",
         "gameName": "",
         "sort": 0,
         "kindId": 1,
@@ -4333,7 +4333,7 @@ window.getGameList = () => [
         }
     },
     {
-        "gameId": "100039",
+        "gameId": "100016",
         "gameName": "",
         "sort": 0,
         "kindId": 1,
@@ -4348,7 +4348,7 @@ window.getGameList = () => [
         }
     },
     {
-        "gameId": "100039",
+        "gameId": "100017",
         "gameName": "",
         "sort": 0,
         "kindId": 1,
