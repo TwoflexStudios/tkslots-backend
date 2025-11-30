@@ -41,52 +41,46 @@ function loadGames(startId, endId, options = {}) {
 // Main game list function
 window.getGameList = () => {
     const allGames = [
-        // 1 series games (1-100)
-        ...loadGames(1, 100),
-        // 1000 series games (1000-1010)
-        ...loadGames(1000, 1010),
-        // 10000 series games (10000-10010)
-        ...loadGames(10000, 10010),
-        // 100000 series games (100000-100100)
-        ...loadGames(100000, 100100),
-        // 200000 series games (200000-200100)
-        ...loadGames(200000, 200100),
-        // 300000 series games (300000-300100)
-        ...loadGames(300000, 300100),
-        // 400000 series games (400000-400100)
-        ...loadGames(400000, 400100),
-        // 500000 series games (500000-500100)
-        ...loadGames(500000, 500100),
-        // 600000 series games (600000-600100)
-        ...loadGames(600000, 600100),
-        // 700000 series games (700000-700100)
-        ...loadGames(700000, 700100),
-        // 800000 series games (800000-800100)
-        ...loadGames(800000, 800100),
-        // 900000 series games (900000-900100)
-        ...loadGames(900000, 900100),
-        // 100000 series games (100000-100100)
-        ...loadGames(100000, 100100),
-        // 110000 series games (110000-110100)
-        ...loadGames(110000, 110100),
-        // 120000 series games (120000-120100)
-        ...loadGames(120000, 120100),
-        // 130000 series games (130000-130100)
-        ...loadGames(130000, 130100),
-        // 140000 series games (140000-140100)
-        ...loadGames(140000, 140100),
-        // 150000 series games (150000-150100)
-        ...loadGames(150000, 150100),
-        // 160000 series games (160000-160100)
-        ...loadGames(160000, 160100),
-        // 170000 series games (170000-170100)
-        ...loadGames(170000, 170100),
-        // 180000 series games (180000-180100)
-        ...loadGames(180000, 180100),
-        // 190000 series games (190000-190100)
-        ...loadGames(190000, 190100),
-        // 200000 series games (200000-200100)
-        ...loadGames(200000, 200100),
+        // 100000 series games (100000-100200)
+        ...loadGames(100000, 100200),
+        // 200000 series games (200000-200200)
+        ...loadGames(200000, 200200),
+        // 300000 series games (300000-300200)
+        ...loadGames(300000, 300200),
+        // 400000 series games (400000-400200)
+        ...loadGames(400000, 400200),
+        // 500000 series games (500000-500200)
+        ...loadGames(500000, 500200),
+        // 600000 series games (600000-600200)
+        ...loadGames(600000, 600200),
+        // 700000 series games (700000-700200)
+        ...loadGames(700000, 700200),
+        // 800000 series games (800000-800200)
+        ...loadGames(800000, 800200),
+        // 900000 series games (900000-900200)
+        ...loadGames(900000, 900200),
+        // 100000 series games (100000-100200)
+        ...loadGames(100000, 100200),
+        // 110000 series games (110000-110200)
+        ...loadGames(110000, 110200),
+        // 120000 series games (120000-120200)
+        ...loadGames(120000, 120200),
+        // 130000 series games (130000-130200)
+        ...loadGames(130000, 130200),
+        // 140000 series games (140000-140200)
+        ...loadGames(140000, 140200),
+        // 150000 series games (150000-150200)
+        ...loadGames(150000, 150200),
+        // 160000 series games (160000-160200)
+        ...loadGames(160000, 160200),
+        // 170000 series games (170000-170200)
+        ...loadGames(170000, 170200),
+        // 180000 series games (180000-180200)
+        ...loadGames(180000, 180200),
+        // 190000 series games (190000-190200)
+        ...loadGames(190000, 190200),
+        // 200000 series games (200000-200200)
+        ...loadGames(200000, 200200),
     ];
     
     return allGames;
