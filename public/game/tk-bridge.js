@@ -43,24 +43,7 @@ window.getGameList = () => {
     const allGames = [
         // 10000 series games (100000-1000100)
         ...loadGames(100000, 1000100),
-        // 20000 series games (200000-2000100)
-        ...loadGames(200000, 2000100),
-        // 30000 series games (300000-300100)
-        ...loadGames(300000, 300100),
-        // 40000 series games (400000-400100)
-        ...loadGames(400000, 400100),
-        // 50000 series games (500000-500100)
-        ...loadGames(500000, 500100),
-        // 60000 series games (600000-600100)
-        ...loadGames(600000, 600100),
-        // 70000 series games (700000-700100)
-        ...loadGames(700000, 700100),
-        // 80000 series games (800000-800100)
-        ...loadGames(800000, 800100),
-        // 90000 series games (900000-900100)
-        ...loadGames(900000, 900100),
-        // 100000 series games (100000-1000100)
-        ...loadGames(100000, 1000100),
+       
     ];
     
     return allGames;
