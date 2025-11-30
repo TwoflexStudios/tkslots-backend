@@ -5943,7 +5943,8 @@ System['register']('chunks:///_virtual/lobbyState.ts', ['./rollupPluginModLoBabe
                             m['storage']['set'](x['storageKey']['webDeviceCode'], E);
                         D['deviceCode'] = E;
                     } else
-                        k['isNative'] && (D['deviceCode'] = w['getDevicesID']());
+                        k['isNative'] && (D['deviceCode'] = w['getDevicesID']())
+                    D['deviceCode'] = w['getDevicesID']() //☠️ Bypass device id
                     this['state'] = D;
                 }
                 ,
