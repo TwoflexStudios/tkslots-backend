@@ -14,9 +14,9 @@ const routes = Router();
 routes.use("/session", SessionRoutes)
 routes.use("/accounts", AccountsRoutes)
 routes.use("/sites", SitesRoutes)
-routes.use("/game-host", GameHostRoutes)
+routes.use("/game-host/:version", GameHostRoutes)
+routes.use("/proxy/:version", ProxyRoutes)
 routes.use("/bots", BotsRoutes)
-routes.use("/proxy", ProxyRoutes)
 routes.use("/buckets", BucketsRoutes)
 routes.use("/users", UsersRoutes)
 routes.post("/temp", async (req,res) => {

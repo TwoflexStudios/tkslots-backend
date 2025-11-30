@@ -5,17 +5,24 @@ import config from "../../../../../config/convict";
 import axios from "axios";
 import { getProxyAgent } from "../../../../../helpers/proxy";
 
-const ProxyRoutes = Router();
+const ProxyRoutes = Router({mergeParams: true});
+
+export const ProxyGameVersionsURL: any = {
+    "riqueza-slots": "https://riquezaslotsh.com",
+    "dv-slots": "https://dvslots5.com/",
+    "brazil-game": "https://brazilgame.org/"
+}
 
 ProxyRoutes.all('{/:agent}', async (req, res) => {
     const gameAsset = req.query["game-asset"];
+    const version = (req.params as any).version;
     let target: any = req.query.url;
 
     if(gameAsset){
         const folder = gameAsset;
         //check if exist in public folder
         try{
-            const file = fs.readFileSync(`./public/game/${folder}`);
+            const file = fs.readFileSync(`./public/versions/${version}/${folder}`);
             if(file){
                 logger.success(`Sending game asset: ${folder}`)
                 
@@ -28,7 +35,7 @@ ProxyRoutes.all('{/:agent}', async (req, res) => {
             }
         }catch{
             logger.info(`Game asset not found: ${folder}`)
-            target = `${config.get("targetUrl")}${gameAsset}`
+            target = `${ProxyGameVersionsURL[version]}${gameAsset}`
         }
     }
 

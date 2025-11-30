@@ -4,9 +4,9 @@ import AuthController from "../../../../../services/authvalidation";
 import AccountsModel from "../../../../../schemas/accounts";
 import config from "../../../../../config/convict";
 
-const GameHostRoutes = Router();
+const GameHostRoutes = Router({mergeParams: true});
 
-GameHostRoutes.get("localConfig.json", (req,res) => {
+GameHostRoutes.get("/localConfig.json", (req,res) => {
     res.status(200).send("Replaced");
 })
 
@@ -14,6 +14,8 @@ GameHostRoutes.get(
     "/:accountId",
     AuthController.QueryAuth(),
     async (req: Request, res: Response) => {
+        console.log(req.params)
+        const version = req.params.version;
         const disableProxy = req.query.disableProxy === "true";
         const forceProxySession = req.query.forceProxySession
         const accountData: any = await AccountsModel.findOne
@@ -24,9 +26,9 @@ GameHostRoutes.get(
             return res.status(404).json({status: "Error", message: "Account not found"})
         }
 
-        let template = fs.readFileSync("./public/game/index.html", "utf-8");
+        let template = fs.readFileSync(`./public/versions/${version}/index.html`, "utf-8");
 
-        template = template.split("{{thisUrl}}").join(config.get("thisUrl"))
+        template = template.split("{{thisUrl}}").join(`${config.get("thisUrl")}/versions/${version}`)
         template = template.split("{{game_data}}").join(`
             window.GAME_DATA = {
                 account: ${JSON.stringify({
@@ -38,7 +40,7 @@ GameHostRoutes.get(
                     bFastLogin: true,
                     connection: {
                         ...accountData.siteId.connection,
-                        http: disableProxy ? `${accountData.siteId.connection.http}/` : `${config.get("thisUrl")}/proxy/${(forceProxySession || accountData.login.proxySession || crypto.randomUUID())}?url=${accountData.siteId.connection.http}/`
+                        http: disableProxy ? `${accountData.siteId.connection.http}/` : `${config.get("thisUrl")}/proxy/${version}/${(forceProxySession || accountData.login.proxySession || crypto.randomUUID())}?url=${accountData.siteId.connection.http}/`
                     }
                 } as any)}
             }    
@@ -48,5 +50,6 @@ GameHostRoutes.get(
         res.status(200).send(template)
     }
 )
+
 
 export default GameHostRoutes;
