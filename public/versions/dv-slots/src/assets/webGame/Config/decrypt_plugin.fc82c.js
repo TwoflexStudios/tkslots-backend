@@ -1,0 +1,1 @@
+(function(a){var b=undefined,c=undefined,d=undefined,e=undefined,f=a,g=a,h=a,i=a;(function(){}['call'](a));}(function(){if(typeof globalThis!=='undefined')return globalThis;if(typeof self!=='undefined')return self;if(typeof window!=='undefined')return window;if(typeof global!=='undefined')return global;if(typeof this!=='undefined')return this;return{};}['call'](this)));

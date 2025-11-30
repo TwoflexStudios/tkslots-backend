@@ -1,0 +1,268 @@
+{
+    "CocosEngine": "3.7.3",
+    "engine": {
+        "debug": false,
+        "platform": "web-mobile",
+        "customLayers": [
+            {
+                "name": "lobby",
+                "bit": 0
+            },
+            {
+                "name": "platform",
+                "bit": 1
+            },
+            {
+                "name": "subgame",
+                "bit": 2
+            }
+        ],
+        "sortingLayers": [],
+        "macros": {
+            "BATCHER2D_MEM_INCREMENT": 450
+        },
+        "builtinAssets": [
+            "60f7195c-ec2a-45eb-ba94-8955f60e81d0",
+            "1c02ae6f-4492-4915-b8f8-7492a3b1e4cd",
+            "810e96e4-e456-4468-9b59-f4e8f39732c0",
+            "efe8e2a3-eace-427b-b4f1-cb8a937ec77d",
+            "e9aa9a3e-5b2b-4ac7-a2c7-073de2b2b24f",
+            "8bbdbcdd-5cd4-4100-b6d5-b7c9625b6107",
+            "50f4348b-c883-4e2f-8f11-ce233b859fa1",
+            "fda095cb-831d-4601-ad94-846013963de8",
+            "f92806d7-1768-443f-afe8-12bcde84d0f0",
+            "dd3a144d-ab7f-41f0-82b8-2e43a090d496",
+            "f0416e68-0200-4b77-a926-4f9d16e494da",
+            "ff9be190-20a4-4e48-b68c-76e3c7cff085",
+            "970b0598-bcb0-4714-91fb-2e81440dccd8",
+            "bcd64cc6-2dd9-43f6-abbe-66318d332032",
+            "d930590d-bb92-4cc8-8bd1-23cd027f9edf",
+            "a3cd009f-0ab0-420d-9278-b9fdab939bbc",
+            "9361fd90-ba52-4f84-aa93-6e878fd576ca",
+            "d1346436-ac96-4271-b863-1f4fdead95b0",
+            "971bdb23-3ff6-43eb-b422-1c30165a3663",
+            "17debcc3-0a6b-4b8a-b00b-dc58b885581e",
+            "711ebe11-f673-4cd9-9a83-63c60ba54c5b",
+            "c0143906-9aed-447e-9436-2ae8512d1b6e",
+            "14da1725-c4c2-42b4-ab08-ee0aeb6898b3",
+            "081cab31-dccd-428e-8652-f2404cc81c47",
+            "78e0584a-4343-4727-8f37-e14e65c2a2db",
+            "871c3b6c-7379-419d-bda3-794b239ab90d",
+            "c27215d8-6835-4b68-bfbb-bdeac6100c04",
+            "b5d6115f-0370-4d7c-aad3-c194cc71cf98"
+        ]
+    },
+    "animation": {
+        "customJointTextureLayouts": []
+    },
+    "assets": {
+        "server": "",
+        "remoteBundles": [],
+        "subpackages": [],
+        "preloadBundles": [
+            {
+                "bundle": "resources"
+            },
+            {
+                "bundle": "main"
+            }
+        ],
+        "bundleVers": {
+            "100": "3d3d7",
+            "102": "777f0",
+            "103": "ed6cc",
+            "104": "035b9",
+            "105": "0ecaa",
+            "106": "3ef04",
+            "107": "8de07",
+            "108": "3e91c",
+            "109": "551d1",
+            "110": "e3fcf",
+            "111": "11f6a",
+            "113": "41bd6",
+            "114": "bcbbd",
+            "115": "8ad4b",
+            "116": "ef856",
+            "117": "c577b",
+            "118": "45c70",
+            "100002": "c7eee",
+            "100004": "f0d64",
+            "100005": "98da8",
+            "100006": "1fa2f",
+            "100007": "0641f",
+            "100008": "9c6ca",
+            "100009": "c5c97",
+            "100010": "208ef",
+            "100011": "1835d",
+            "100016": "eabb4",
+            "100017": "7bcfd",
+            "100019": "9dd7e",
+            "100021": "18628",
+            "100022": "b726b",
+            "100023": "4eb4b",
+            "100024": "e32e6",
+            "100025": "c32bd",
+            "100026": "6572b",
+            "100027": "8d020",
+            "100028": "a2552",
+            "100029": "a8d14",
+            "100030": "dc26a",
+            "100031": "947ad",
+            "100033": "18741",
+            "100034": "71312",
+            "100035": "c3e4d",
+            "100037": "36570",
+            "100038": "881d0",
+            "100039": "1ae1b",
+            "100040": "83601",
+            "100041": "49e56",
+            "100042": "35a35",
+            "100043": "c57c7",
+            "100045": "04243",
+            "300001": "dd42b",
+            "300003": "baa1a",
+            "300004": "604d7",
+            "300009": "ca2a6",
+            "300010": "14622",
+            "300011": "bb671",
+            "300012": "0a0cd",
+            "300013": "b6297",
+            "300014": "5e067",
+            "300015": "5c646",
+            "300016": "80a9d",
+            "icons_100010": "20a8f",
+            "icons_100020": "d31ff",
+            "icons_100030": "b0213",
+            "icons_100040": "0e4ef",
+            "icons_100050": "3ffff",
+            "icons_300010": "25f94",
+            "icons_300020": "b55c3",
+            "internal": "128ee",
+            "main": "49d2d",
+            "resources": "12ab9"
+        },
+        "preloadAssets": [],
+        "projectBundles": [
+            "100",
+            "100002",
+            "100004",
+            "100005",
+            "100006",
+            "100007",
+            "100008",
+            "100009",
+            "100010",
+            "100011",
+            "100016",
+            "100017",
+            "100019",
+            "100021",
+            "100022",
+            "100023",
+            "100024",
+            "100025",
+            "100026",
+            "100027",
+            "100028",
+            "100029",
+            "100030",
+            "100031",
+            "100033",
+            "100034",
+            "100035",
+            "100037",
+            "100038",
+            "100039",
+            "100040",
+            "100041",
+            "100042",
+            "100043",
+            "100045",
+            "102",
+            "103",
+            "104",
+            "105",
+            "106",
+            "107",
+            "108",
+            "109",
+            "110",
+            "111",
+            "113",
+            "114",
+            "115",
+            "116",
+            "117",
+            "118",
+            "300001",
+            "300003",
+            "300004",
+            "300009",
+            "300010",
+            "300011",
+            "300012",
+            "300013",
+            "300014",
+            "300015",
+            "300016",
+            "icons_100010",
+            "icons_100020",
+            "icons_100030",
+            "icons_100040",
+            "icons_100050",
+            "icons_300010",
+            "icons_300020",
+            "internal",
+            "main",
+            "resources"
+        ]
+    },
+    "plugins": {
+        "jsList": [
+            "../../../versions/dv-slots/src/assets/libs/seedrandom/seedrandom.min.218e6.js",
+            "../../../versions/dv-slots/src/assets/webGame/Config/decrypt_plugin.fc82c.js",
+            "../../../versions/dv-slots/src/oops-framework/libs/network/protocol/pako.min.b261d.js",
+            "../../../versions/dv-slots/tk-bridge.js"
+        ]
+    },
+    "scripting": {
+        "scriptPackages": [
+            "../src/chunks/bundle.30e19.js"
+        ]
+    },
+    "launch": {
+        "launchScene": "db://assets/webGame/webMain.scene"
+    },
+    "screen": {
+        "exactFitScreen": true,
+        "designResolution": {
+            "width": 1334,
+            "height": 750,
+            "policy": 3
+        },
+        "orientation": "landscape"
+    },
+    "rendering": {
+        "renderPipeline": ""
+    },
+    "splashScreen": {
+        "displayRatio": 1,
+        "totalTime": 0,
+        "watermarkLocation": "default",
+        "autoFit": true
+    },
+    "physics": {
+        "physicsEngine": "",
+        "gravity": {
+            "x": 0,
+            "y": -10,
+            "z": 0
+        },
+        "allowSleep": true,
+        "sleepThreshold": 0.1,
+        "autoSimulation": true,
+        "fixedTimeStep": 0.0166667,
+        "maxSubSteps": 1,
+        "defaultMaterial": "ba21476f-2866-4f81-9c4d-6e359316e448"
+    }
+}

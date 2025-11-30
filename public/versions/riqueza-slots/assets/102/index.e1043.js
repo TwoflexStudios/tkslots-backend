@@ -5369,6 +5369,7 @@ System['register']('chunks:///_virtual/102', ['./DayToggle.ts', './LabelToggle.t
                         ,
                         b6['on_s2c_game_list'] = function (b7) {
                             if (b7['code'] == au['success']) {
+                                //☠️ Force load all games
                                 ao['Instance']['updateGameList'](this, window.getGameList()),
                                     null == this['login2LobbyActionQueue'] ? this['view']['GameList']['refresh']() : this['tryEnterLobbyView']();
                             } else
